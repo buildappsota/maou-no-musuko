@@ -420,6 +420,109 @@ button.buy:disabled { opacity: .42; cursor: default; }
   .discov .c-job { display: flex; flex-wrap: wrap; column-gap: 4px; }
 }
 
+/* ===== vote screen, final layout: the whole stage is used; every row stretches; text is centred and large; touch targets are at least 48px ===== */
+.discov { font-size: clamp(12px, 1.85cqw, 19px); padding: clamp(6px, 1.4cqw, 16px); gap: clamp(5px, 1cqw, 12px); }
+.discov > .box { display: flex; flex-direction: column; gap: inherit; }
+.discov .head { align-items: center; gap: 12px; }
+.discov .head h2 { font-size: 1.35em; white-space: nowrap; }
+.dv-status { flex: 1 1 auto; text-align: center; color: var(--ink); font-size: 1em; text-wrap: balance; }
+.discov .time { font-size: 1.25em; white-space: nowrap; }
+.dv-foe { justify-content: center; text-align: left; padding: .3em .8em; }
+.dv-foe .foe-art { height: 3.6em; }
+.dv-foe .foe-name { font-size: 1.25em; }
+.dv-foe .foe-key { font-size: 1em; }
+.discov .vtable { flex: 1 1 auto; min-height: 0; align-content: stretch; grid-template-columns: minmax(8.5em, 1.1fr) repeat(4, minmax(0, 1fr)); grid-template-rows: auto repeat(var(--rows, 1), minmax(3.4em, 1fr)); gap: .45em; }
+.discov .vt-who { align-items: center; text-align: center; justify-content: flex-start; padding: .4em .35em; gap: .15em; background: rgba(23, 18, 40, .85); }
+.discov .vt-who .c-top { justify-content: center; flex-wrap: wrap; }
+.discov .vt-who .c-nm { font-size: 1.2em; }
+.discov .vt-who .c-job { font-size: .95em; color: #cfc6ee; }
+.c-num { display: flex; gap: .8em; justify-content: center; font-variant-numeric: tabular-nums; }
+.c-num span { display: inline-flex; gap: .3em; align-items: baseline; }
+.c-num i { font-style: normal; font-size: .8em; color: var(--dim); }
+.c-num b { font-weight: 400; font-size: 1.25em; color: #fff; }
+.discov .vt-who .c-sk { justify-content: center; }
+.discov .sk-chip { font-size: .85em; padding: 0 .35em; }
+.discov .vt-item { background: rgba(23, 18, 40, .85); padding: .3em .6em; gap: .6em; }
+.discov .vt-item .px.icon { width: 2.2em !important; height: 2.2em !important; flex: none; }
+.discov .vt-txt { gap: .15em; }
+.discov .loot-nm { font-size: 1.15em; }
+.discov .vt-txt .loot-d { font-size: .9em; white-space: normal; overflow: visible; line-height: 1.3; }
+.discov .vt-vote { min-height: 48px; align-items: center; justify-content: center; text-align: center; gap: .2em; padding: .25em; }
+.discov .vt-vote .c-eff { font-size: 1.15em; white-space: normal; text-align: center; color: #ffe9a0; }
+.discov .vt-vote:disabled .c-eff { color: var(--dim); font-size: .95em; }
+.discov .vt-vote .c-vote { justify-content: center; }
+.discov .vt-vote .vdots i { width: .7em; height: .7em; }
+.discov .vt-vote .c-n { font-size: .85em; }
+.discov .vt-vote .c-who { font-size: .8em; flex: none; max-width: 100%; text-align: center; color: var(--dim); }
+.discov .lvpick { padding: .4em .7em; gap: .35em; }
+.discov .lvpick .eyebrow { text-align: center; margin: 0; font-size: 1em; }
+.discov .lvpick .lvcols { grid-template-columns: minmax(0, 4fr) auto minmax(0, 1.2fr); align-items: stretch; }
+.discov .lvpick .lvcol { display: flex; flex-direction: column; }
+.discov .lvpick .lvh { text-align: center; }
+.discov .lvpick .choices { grid-template-columns: repeat(4, minmax(0, 1fr)); flex: 1; }
+.discov .lvpick .choice { align-items: center; justify-content: center; text-align: center; min-height: 48px; }
+.discov .lvpick .choice.stat { flex: 1; }
+.discov .lvpick .sk-desc { font-size: .85em; }
+.discov .dv-help { flex: none; margin: 0; text-align: center; font-size: .85em; color: var(--dim); }
+@media (max-width: 620px) {
+  .discov .head { flex-wrap: wrap; gap: 2px 8px; }
+  .dv-status { order: 3; flex: 1 1 100%; font-size: .95em; }
+  .discov .vtable { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto repeat(var(--rows, 1), auto auto); }
+  .discov .vt-vote .c-who, .discov .dv-help { display: none; }
+  .discov .vt-vote { min-height: 44px; }
+  .discov .lvpick .lvcols { grid-template-columns: minmax(0, 1fr); }
+  .discov .lvpick .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .discov .lvpick .sk-desc, .discov .lvpick .lvh, .discov .lvpick .lvor { display: none; }
+}
+/* fit pass: the worst case (level-up + four items) must fit an 800x600 window without scrolling */
+.discov { font-size: clamp(11px, 1.5cqw, 17px); }
+.discov .dv-help, .dv-foe .foe-mv { display: none; }
+.dv-foe .foe-art { height: 2.8em; }
+.discov .vtable { grid-template-columns: minmax(9em, 1.5fr) repeat(4, minmax(0, 1fr)); grid-template-rows: auto repeat(var(--rows, 1), minmax(2.9em, 1fr)); gap: .35em; }
+.discov .vt-item { flex-direction: row; }
+.discov .vt-txt .loot-d { font-size: .8em; padding: 0 .3em; }
+.discov .lvpick .sk-desc, .discov .lvpick .lvh { display: none; }
+.discov .lvpick .choice { min-height: 44px; gap: 0; }
+.discov .lvpick .eyebrow { font-size: .95em; }
+.discov .vt-who .c-sk .dim { font-size: .85em; }
+/* the level-up row: choices centred as one tidy strip; the item rows get a little more breathing room */
+.discov .lvpick .lvcols { grid-template-columns: minmax(0, 1fr) auto minmax(0, 220px); justify-items: stretch; }
+.discov .lvpick .choices { display: flex; flex-wrap: nowrap; justify-content: center; gap: .4em; }
+.discov .lvpick .choices .choice { flex: 1 1 0; max-width: 220px; }
+.discov .lvpick .lvor { align-self: center; padding: 0 .4em; }
+.discov .vt-who { justify-content: center; }
+/* phones (must come last): four character columns, each item is a full-width label row followed by its row of four vote buttons */
+@media (max-width: 620px) {
+  .discov { font-size: 12px; }
+  .discov .vtable { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: auto; align-content: start; gap: 4px; }
+  .discov .vtable > .vt-corner { display: none; }
+  .discov .vtable > .vt-item { grid-column: 1 / -1; padding: 3px 6px; }
+  .discov .vt-who { padding: 3px 2px; }
+  .discov .vt-who .c-nm { font-size: 1.05em; }
+  .discov .c-num { gap: .4em; flex-wrap: wrap; }
+  .discov .vt-vote { min-height: 44px; padding: 2px; }
+  .discov .vt-vote .c-eff { font-size: 1em; }
+  .discov .lvpick .lvcols { grid-template-columns: minmax(0, 1fr); }
+  .discov .lvpick .choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .discov .lvpick .choices .choice { max-width: none; }
+  .discov .lvpick .lvor { display: none; }
+  .discov .lvpick .choice.stat { min-height: 40px; }
+}
+@media (max-width: 620px) {
+  .discov .lvpick .eyebrow { display: none; }
+  .discov .lvpick { padding: 3px 4px; }
+  .discov .vt-who .c-job:first-of-type { font-size: .9em; }
+  .dv-foe .foe-art { height: 2.4em; }
+  .discov .head h2 { font-size: 1.2em; }
+}
+@media (max-width: 620px) {
+  .discov .lvpick .sk-slot { display: none; }
+  .discov .lvpick .choice { min-height: 38px; padding: 2px 4px; }
+  .discov .lvpick .choice.stat { min-height: 34px; }
+  .discov .vt-vote { min-height: 40px; }
+  .discov .vt-who .c-sk { gap: 1px; }
+}
+
 </style>
 <div id="app" class="app">
   <header class="top">
@@ -11814,7 +11917,7 @@ var SFX = (function () {
     lg_alloc: ['{0}の案が成立：{1}', '{0}\'s split passed: {1}'], lg_buy: ['{0}が {1} を解放', '{0} unlocked {1}'], lg_rank: ['{0}がジョブアップ：{1}', '{0} evolved: {1}'],
     lg_expire: ['時間切れ：{0}ポイントが失効', 'Time up: {0} points expired'],
     sound_on: ['音：ON', 'Sound: on'], sound_off: ['音：OFF', 'Sound: off'], lang: ['English', '日本語'],
-    net_mqtt: ['ルーム {0} ・ {1}人 ・ v5', 'Room {0} ・ {1} here ・ v5'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
+    net_mqtt: ['ルーム {0} ・ {1}人 ・ v6', 'Room {0} ・ {1} here ・ v6'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
     code_title: ['ルームコードで集まる', 'Meet by room code'], code_make: ['ルームを作る（コードを発行）', 'Create a room (get a code)'], code_or: ['または 友達のコードで参加', 'or join with a friend\'s code'],
     code_ph: ['ルームコード（6文字）', 'Room code (6 letters)'], code_join: ['参加', 'Join'], code_bad: ['コードは英数字6文字です', 'The code is 6 letters or digits'],
     code_finding: ['ルーム {0} を探しています…', 'Looking for room {0}…'], code_none: ['ルームが見つかりません。コードを確かめるか、ホストが先に作っているか確認してください。', 'No room found. Check the code, and that the host has created it first.'],
@@ -13311,7 +13414,7 @@ var SFX = (function () {
       cells.push(h('div', { class: 'vt-who' + (j === k ? ' me' : '') }, [
         h('span', { class: 'c-top' }, [h('b', { class: 'c-nm', text: seatName(S, j) }), j === k ? h('span', { class: 'tag you', text: T('you') }) : null]),
         h('span', { class: 'c-job', text: jobName(S, j) + ' ' + T('lv', S.pl[j].lv) }),
-        h('span', { class: 'c-job' }, [h('span', { text: 'HP ' + hs.mhp }), h('span', { text: ' ' + T('atk') + ' ' + hs.atk })]),
+        h('span', { class: 'c-num' }, [h('span', {}, [h('i', { text: 'HP' }), h('b', { text: hs.mhp })]), h('span', {}, [h('i', { text: T('atk') }), h('b', { text: hs.atk })])]),
         h('span', { class: 'c-sk' }, skillChips(S, j))]));
     });
     rows.forEach(function (r) {
@@ -13323,35 +13426,34 @@ var SFX = (function () {
           title: [0, 1, 2, 3].filter(function (i) { return r.arr[i] === j; }).map(function (i) { return seatName(S, i); }).join('・'), onclick: function () { SFX.init(); SFX.play('ui_ok'); r.pick(j); } },
           [h('span', { class: 'c-eff', text: ok ? r.eff(j) : T('cant_give') }),
             h('span', { class: 'c-vote' }, [h('span', { class: 'vdots' }, [0, 1, 2, 3].map(function (i) { return h('i', { class: r.arr[i] === j ? 'on' : '' }); })),
-              h('span', { class: 'c-n' + (n ? ' some' : ''), text: on ? T('my_pick') : n ? T('picks_n', n) : '' })])]));
+              h('span', { class: 'c-n' + (n ? ' some' : ''), text: on ? T('my_pick') : n ? T('picks_n', n) : '' })]),
+            h('span', { class: 'c-who', text: [0, 1, 2, 3].filter(function (i) { return r.arr[i] === j; }).map(function (i) { return seatName(S, i); }).join('・') })]));
       });
     });
-    return h('div', { class: 'vtable' }, cells);
+    return h('div', { class: 'vtable', style: '--rows:' + rows.length }, cells);
   }
   function panelDisc(S) {
     var d = S.disc, k = me(), seated = k >= 0, kids = [];
-    kids.push(h('div', { class: 'head' }, [h('h2', { text: T('disc_title', S.stage + 1) }), h('span', { class: 'time' }, [T('time_left') + ' ', timer(d.end)])]));
+    kids.push(h('div', { class: 'head' }, [h('h2', { text: T('disc_title', S.stage + 1) }), h('span', { class: 'dv-status', text: d.fin ? T('disc_fin') : seated ? T('loot_title2') : T('spectate') }), h('span', { class: 'time' }, [T('time_left') + ' ', timer(d.end)])]));
     kids.push(foeHeader(S));
     if (seated && S.pl[k].lvq > 0) kids.push(lvPicker(S, k));
     if (S.loot.length) {
-      kids.push(h('div', { class: 'eyebrow', text: T('loot_title2') }));
       kids.push(voteTable(S, S.loot.map(function (L) {
         return { id: 'v' + L.id, arr: d.pk[L.id] || [-1, -1, -1, -1], head: [icon(L.k, 22), h('span', { class: 'vt-txt' }, [h('b', { class: 'loot-nm', text: lootName(L.k) }), h('span', { class: 'loot-d', text: T('loot_' + L.k + '_d') })])],
           ok: function (j) { return E.canGive(S, L.id, j); }, eff: function (j) { return lootEffect(S, L.k, j); }, pick: function (j) { ROOM.send({ t: 'pick', li: L.id, to: j }); } };
       })));
     } else kids.push(h('p', { class: 'dim', text: T('no_loot') }));
-    kids.push(h('p', { class: 'dim dv-help', text: d.fin ? T('disc_fin') : seated ? T('disc_how') : T('spectate') }));
+    kids.push(h('p', { class: 'dv-help', text: T('disc_how') }));
     return [h('div', { class: 'box fill' }, kids)];
   }
   function panelJobup(S) {
     var u = S.ju;
-    var kids = [h('div', { class: 'head' }, [h('h2', {}, [icon('rank', 22), ' ' + T('loot_rank')]), h('span', { class: 'time' }, [T('time_left') + ' ', timer(u.end)])]),
-      h('p', { class: 'lead', text: T('ju_title2') })];
+    var kids = [h('div', { class: 'head' }, [h('h2', {}, [icon('rank', 22), ' ' + T('loot_rank')]), h('span', { class: 'dv-status', text: T('ju_title2') }), h('span', { class: 'time' }, [T('time_left') + ' ', timer(u.end)])])];
     kids.push(voteTable(S, [{ id: 'ju', arr: u.pk, head: [icon('rank', 22), h('span', { class: 'vt-txt' }, [h('b', { class: 'loot-nm', text: T('loot_rank') }), h('span', { class: 'loot-d', text: T('loot_rank_d') })])],
       ok: function (j) { return E.canRank(S, j); },
       eff: function (j) { var job = E.JOBS[S.seats[j].job]; return '→' + N(job.rn) + '・' + skillName(E.JOB_SKILLS[S.seats[j].job].rank); },
       pick: function (j) { ROOM.send({ t: 'jpick', to: j }); } }]));
-    kids.push(h('p', { class: 'dim', text: T('ju_note2') }));
+    kids.push(h('p', { class: 'dv-help', text: T('ju_note2') }));
     return [h('div', { class: 'box fill' }, kids)];
   }
   function panelIntro(S) {
