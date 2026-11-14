@@ -246,11 +246,13 @@ button.buy:disabled { opacity: .42; cursor: default; }
 .choice b { font-weight: 400; color: var(--gold); }
 .icon { width: 20px; height: 20px; flex: none; vertical-align: middle; }
 .chip.lvq { border-color: var(--gold); color: var(--gold-ink); background: var(--gold); }
-.loots { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 6px; }
+.loots { display: flex; flex-direction: column; gap: 6px; }
 .loot { border: 1px solid var(--line); background: #171228; padding: 5px 7px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .loot-h { display: flex; gap: 6px; align-items: center; min-width: 0; font-size: 13px; }
 .loot-h b { font-weight: 400; color: var(--gold); white-space: nowrap; }
 .loot-h .dim { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.loot-nm { font-size: 15px; }
+.loot-d { color: #ffe9a0; font-size: 13px; background: #2c2210; border: 1px solid #6b5420; padding: 0 6px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .giveto { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 .btn.on { border-color: var(--green); color: var(--green); }
 .lvpick { border: 2px solid var(--gold); background: rgba(232, 193, 90, .08); padding: 6px 8px; display: flex; flex-direction: column; gap: 5px; }
@@ -317,6 +319,51 @@ button.buy:disabled { opacity: .42; cursor: default; }
 .inv-l { color: var(--dim); font-size: 12px; }
 .inv-code { font-family: var(--mono); font-size: 30px; letter-spacing: .12em; color: #fff1a8; font-weight: 700; text-shadow: 0 0 .4em rgba(232, 193, 90, .6); }
 .inv-dl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; border-top: 1px solid rgba(232, 193, 90, .35); padding-top: 5px; margin-top: 2px; }
+
+/* picking cards: one per character, used for the spoils and the job-up stone */
+.cands { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+@media (max-width: 620px) { .cands { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cand { font: inherit; color: var(--ink); text-align: left; background: var(--panel2); border: 2px solid var(--line); padding: 4px 6px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cand:hover:not(:disabled) { border-color: var(--gold); }
+.cand:disabled { opacity: .45; cursor: default; }
+.cand.on { border-color: var(--green); background: #183326; box-shadow: 0 0 0 2px rgba(111, 208, 140, .35); }
+.cand.hot:not(.on) { border-color: var(--gold); }
+.c-top { display: flex; gap: 4px; align-items: center; min-width: 0; }
+.c-nm { font-weight: 400; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.c-job { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c-sk { display: flex; flex-wrap: wrap; gap: 2px; align-items: center; min-height: 16px; }
+.sk-chip { font-size: 10px; padding: 0 3px; border: 1px solid var(--line); background: #0f0b1a; white-space: nowrap; }
+.sk-chip.ult { border-color: var(--gold); color: var(--gold); }
+.sk-chip.rk { border-color: var(--violet); color: #e2c8ff; }
+.c-eff { font-size: 12px; color: #ffe9a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c-vote { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; font-size: 11px; }
+.c-n { color: var(--dim); }
+.c-n.some { color: var(--green); }
+.c-who { color: var(--dim); font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1 1 60px; }
+.p-st { font-size: 11px; color: var(--dim); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* the rescue button when the connection dropped */
+.reconn { position: fixed; left: 50%; top: 44px; transform: translateX(-50%); z-index: 50; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center;
+  background: #3a1414; border: 2px solid var(--red); padding: 8px 12px; max-width: calc(100vw - 24px); box-shadow: 0 4px 18px rgba(0, 0, 0, .6); }
+.reconn b { color: #ffd0c8; font-weight: 400; }
+.reconn[hidden] { display: none; }
+
+/* the vote table: status of each character once, then one row of vote buttons per item */
+.vtable { display: grid; grid-template-columns: minmax(120px, 1.15fr) repeat(4, minmax(0, 1fr)); gap: 4px; }
+.vt-who { background: #171228; border: 1px solid var(--line); padding: 3px 5px; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.vt-who.me { border-color: #4f76a8; }
+.vt-item { display: flex; gap: 6px; align-items: center; min-width: 0; background: #171228; border: 1px solid var(--line); padding: 3px 6px; }
+.vt-txt { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+.vt-txt .loot-d { font-size: 11px; }
+.vt-vote { font: inherit; color: var(--ink); background: var(--panel2); border: 2px solid var(--line); padding: 3px 5px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; align-items: flex-start; justify-content: center; min-width: 0; text-align: left; }
+.vt-vote:hover:not(:disabled) { border-color: var(--gold); }
+.vt-vote:disabled { opacity: .4; cursor: default; }
+.vt-vote.on { border-color: var(--green); background: #183326; box-shadow: 0 0 0 2px rgba(111, 208, 140, .35); }
+.vt-vote.hot:not(.on) { border-color: var(--gold); }
+@media (max-width: 620px) {
+  .vtable { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .vt-corner { display: none; }
+  .vt-item { grid-column: 1 / -1; }
+}
 
 </style>
 <div id="app" class="app">
@@ -10023,6 +10070,57 @@ button.buy:disabled { opacity: .42; cursor: default; }
       return out;
     }
   };
+
+  // Enhance: a golden warcry that lifts every ally (targets = the whole party)
+  FX.defs.k_enhance = {
+    dur: 760, dir: 0,
+    draw: function (fb, t, c) {
+      var i, tg = c.targets && c.targets.length ? c.targets : [{ x: c.x, y: c.y }], p = seg(t, 0, 0.35), a = 1 - seg(t, 0.75, 1);
+      shockRing(fb, c.sx, c.sy - 4, 6 + 46 * eo(p), 2, '#ffe9a0', 0.8 * (1 - p));
+      glow(fb, c.sx, c.sy - 6, 26, '#ffd25a', 0.5 * (1 - p));
+      for (i = 0; i < tg.length; i++) {
+        var q = seg(t, 0.2 + i * 0.05, 0.75), x = tg[i].x, y = tg[i].y;
+        if (q <= 0) continue;
+        glow(fb, x, y, 22, '#ffb43a', 0.45 * a * Math.sin(q * Math.PI));
+        for (var k = 0; k < 3; k++) {            // rising arrows
+          var ay = y + 10 - 26 * eo(seg(q, k * 0.18, 0.7 + k * 0.1)), ax = x - 8 + k * 8;
+          U.line(fb, ax, ay, ax, ay + 7, '#ffe34d', a, 2);
+          U.line(fb, ax - 3, ay + 3, ax, ay, '#fff1a8', a, 1); U.line(fb, ax + 3, ay + 3, ax, ay, '#fff1a8', a, 1);
+        }
+        sparkles(fb, x, y, 6, 16, c.seed + i, q, '#fff1a8', true);
+      }
+      return t > 0.05 && t < 0.15 ? { shake: 1 } : null;
+    }
+  };
+  // Holy Slash: a bright cross cut, then a little green light flows back to the knight
+  FX.defs.k_holy = {
+    dur: 600, hit: 0.42, dir: -1,
+    draw: function (fb, t, c) {
+      var p = seg(t, 0.1, 0.45), a = 1 - seg(t, 0.55, 1), x = c.x, y = c.y;
+      if (t < 0.5) {
+        taper(fb, x - 22 * eo(p), y - 22 * eo(p), x + 22 * eo(p), y + 22 * eo(p), 1, 6, '#fff1a8', 0.95, true);
+        taper(fb, x + 22 * eo(seg(p, 0.3, 1)), y - 22 * eo(seg(p, 0.3, 1)), x - 22 * eo(seg(p, 0.3, 1)), y + 22 * eo(seg(p, 0.3, 1)), 1, 6, '#ffffff', 0.95, true);
+      }
+      if (t > 0.38) { var s = seg(t, 0.38, 0.8); star8(fb, x, y, 16 * (0.6 + 0.6 * eo(s)), '#fff1a8', 1 - s, 0.3); glow(fb, x, y, 24, '#ffe9a0', 0.6 * (1 - s)); }
+      if (t > 0.55) {
+        var r = seg(t, 0.55, 1);
+        for (var i = 0; i < 5; i++) { var f = seg(r, i * 0.08, 0.7 + i * 0.06); U.star(fb, Math.round(lerp(x, c.sx, eo(f))), Math.round(lerp(y, c.sy - 6, eo(f)) - Math.sin(f * Math.PI) * 10), 2, '#8fe3a0', 1 - f); }
+        glow(fb, c.sx, c.sy - 4, 18, '#8fe3a0', 0.5 * Math.sin(r * Math.PI));
+      }
+      return t > 0.42 && t < 0.52 ? { shake: 2 } : null;
+    }
+  };
+  // a hero charging an ultimate: a pulsing red-gold aura (looping status marker)
+  FX.defs.st_chg = {
+    dur: 900, dir: 0,
+    draw: function (fb, t, c) {
+      var pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 2), x = c.x, y = c.y;
+      glow(fb, x, y - 2, 20 + 6 * pulse, '#ff5a2a', 0.35 + 0.25 * pulse);
+      shockRing(fb, x, y + 10, 10 + 10 * t, 1, '#ffd25a', 0.7 * (1 - t), 0.35);
+      sparkles(fb, x, y, 6, 18, c.seed, t, '#ffe34d', true);
+      return null;
+    }
+  };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 
 
@@ -10668,13 +10766,15 @@ var SFX = (function () {
   var P = E.P = {
     passVotes: 3, lvStart: 1, lvMob: 1, lvBoss: 2, ultNeed: 2,      // level-up stones: at the start, per mob, per boss
     hpUp: 0.20, atkUp: 0.15, rankHp: 1.25, rankAtk: 1.15, maxRank: 2,
-    swordMul: 1.25, ringHp: 0.5, shieldBlocks: 2, shieldBlocksFinal: 1,                     // Hero's Sword, Gold Ring, King Shield
+    swordMul: 1.25, ringHp: 0.5, shieldBlocks: 1, shieldBlocksFinal: 1,
+    heroAtk: 1.2, enHp: 0.8,                                        // tempo: every hero hits 20% harder, every monster has 20% less HP
+    enhMul: 1.3, enhRounds: 2, holyDrain: 0.2, ultCd: 2, sonUltCap: 0.6,   // Enhance, Holy Slash, ultimate cooldown after it fires, the Son's ultimate never takes more than 60% of a villager's max HP                     // Hero's Sword, Gold Ring, King Shield
     vary: 0.15, crit: 1.5, critBase: 0.08, enemyCrit: 0.1, enemyCritMul: 1.4,
     guardTake: 0.7, guardAoe: 0.5, shield: 0.5, shieldRounds: 2,
         powerMul: 1.5, powerHits: 3, stealthMul: 1.6, poisonDot: 0.4, poisonRounds: 4,
     chill: 0.5, counterPow: 0.8, atkDown: 0.75, atkDownRounds: 2, weakUlt: 2.0,
     // the traitor's "awakening" in the final battle: HP = hpBase + hpMul x own HP, ATK x atk[job], acts per round, AoE damage factor
-    son: { hpBase: 720, hpMul: 2, atk: [1.56, 1.97, 1.9, 2.1], rankAtk: 1.06, acts: 2, aoe: 0.55, ward: 0.55, rage: 0.06, cap: 30 },   // cap: the final ends after this many rounds (higher remaining HP share wins). rage: the Son hits harder every round, so the fight always ends
+    son: { hpBase: 720, hpMul: 2, hpJob: [0.75, 1, 1, 1], atk: [1.39, 1.86, 1.3, 2.12], rankAtk: 1.06, acts: 2, aoe: 0.55, ward: 0.55, rage: 0.06, cap: 30 },   // cap: the final ends after this many rounds (higher remaining HP share wins). rage: the Son hits harder every round, so the fight always ends
     discSec: 90, turnSec: 10, lvSec: 10, introSec: 25, cutSec: 5, juSec: 60, evoSec: 6
   };
 
@@ -10693,14 +10793,14 @@ var SFX = (function () {
   var SK = E.SK = {
     k_charge: { job: 0, slot: 'basic', n: ['チャージ', 'Charge'], tg: 'foe', pow: 1.0, ms: 420, sfx: 'slash',
       d: ['敵1体を攻撃', 'Attack one enemy'] },
-    k_shield: { job: 0, slot: 'p1', n: ['シールド', 'Shield'], tg: 'self', cd: 3, eff: 'shield', ms: 700, sfx: 'guard',
-      d: ['2ラウンド、自分が受けるダメージ半減', 'Halve damage you take for 2 rounds'] },
-    k_counter: { job: 0, slot: 'p2', n: ['カウンター', 'Counter'], tg: 'self', cd: 2, eff: 'counter', ms: 460, sfx: 'buff',
-      d: ['このラウンド、攻撃を受けるたび反撃', 'This round, strike back whenever you are hit'] },
+    k_enhance: { job: 0, slot: 'p1', n: ['エンハンス', 'Enhance'], tg: 'party', cd: 3, eff: 'atkup', ms: 760, sfx: 'buff',
+      d: ['味方全員の攻撃力を2ラウンドの間 ×1.3', 'All allies deal x1.3 damage for 2 rounds'] },
+    k_holy: { job: 0, slot: 'p2', n: ['ホーリースラッシュ', 'Holy Slash'], tg: 'foe', pow: 1.1, cd: 2, drain: 0.2, ms: 560, sfx: 'slash',
+      d: ['敵1体を攻撃し、与えたダメージの20%回復', 'Attack one enemy and heal 20% of the damage dealt'] },
     k_break: { job: 0, slot: 'type', n: ['ブレイクソード', 'Break Sword'], tg: 'foe', pow: 1.0, brk: 1, ms: 640, sfx: 'break',
       d: ['防御を無視して敵1体を攻撃', 'Attack one enemy, ignoring armor'] },
-    k_ult: { job: 0, slot: 'ult', n: ['ジャッジメント', 'Judgment'], tg: 'foe', pow: 4.4, ult: 1, ms: 1400, sfx: 'ult',
-      d: ['敵1体に特大ダメージ（戦闘ごとに1回）', 'Massive damage to one enemy (once per battle)'] },
+    k_ult: { job: 0, slot: 'ult', n: ['ジャッジメント', 'Judgment'], tg: 'foe', pow: 2.9, ult: 1, ms: 1400, sfx: 'ult',
+      d: ['ためて次の自分の番に放つ（その後2R使えない）', 'Charge, then unleash on your next turn (2-round cooldown after)'] },
     k_rank: { job: 0, slot: 'rank', n: ['ドラゴンブレス', 'Dragon Breath'], tg: 'foes', pow: 1.2, cd: 3, ms: 1100, sfx: 'fire',
       d: ['敵全体を攻撃', 'Attack all enemies'] },
 
@@ -10712,8 +10812,8 @@ var SFX = (function () {
       d: ['敵1体に3連撃', 'Hit one enemy 3 times'] },
     f_blaze: { job: 1, slot: 'type', n: ['ブレイズウェーブ', 'Blaze Wave'], tg: 'foes', pow: 1.0, fire: 1, ms: 950, sfx: 'fire',
       d: ['敵全体を攻撃', 'Attack all enemies'] },
-    f_ult: { job: 1, slot: 'ult', n: ['メテオスマッシュ', 'Meteor Smash'], tg: 'foe', pow: 3.2, ult: 1, ms: 1400, sfx: 'ult',
-      d: ['敵1体に特大ダメージ（戦闘ごとに1回）', 'Massive damage to one enemy (once per battle)'] },
+    f_ult: { job: 1, slot: 'ult', n: ['メテオスマッシュ', 'Meteor Smash'], tg: 'foe', pow: 2.2, ult: 1, ms: 1400, sfx: 'ult',
+      d: ['ためて次の自分の番に放つ（その後2R使えない）', 'Charge, then unleash on your next turn (2-round cooldown after)'] },
     f_rank: { job: 1, slot: 'rank', n: ['チャンピオンラッシュ', 'Champion Rush'], tg: 'foe', pow: 0.36, hits: 5, cd: 3, ms: 1100, sfx: 'punch',
       d: ['敵1体に5連撃', 'Hit one enemy 5 times'] },
 
@@ -10725,8 +10825,8 @@ var SFX = (function () {
       d: ['敵1体を攻撃し、4ラウンド毒', 'Attack one enemy and poison it for 4 rounds'] },
     a_break: { job: 2, slot: 'type', n: ['ブレイクエッジ', 'Break Edge'], tg: 'foe', pow: 1.0, brk: 1, ms: 620, sfx: 'break',
       d: ['防御を無視して敵1体を攻撃', 'Attack one enemy, ignoring armor'] },
-    a_ult: { job: 2, slot: 'ult', n: ['アサシネイト', 'Assassinate'], tg: 'foe', pow: 2.8, ult: 1, ms: 1450, sfx: 'ult',
-      d: ['敵1体に特大ダメージ（戦闘ごとに1回）', 'Massive damage to one enemy (once per battle)'] },
+    a_ult: { job: 2, slot: 'ult', n: ['アサシネイト', 'Assassinate'], tg: 'foe', pow: 2.0, ult: 1, ms: 1450, sfx: 'ult',
+      d: ['ためて次の自分の番に放つ（その後2R使えない）', 'Charge, then unleash on your next turn (2-round cooldown after)'] },
     a_rank: { job: 2, slot: 'rank', n: ['シャドウダンス', 'Shadow Dance'], tg: 'foe', pow: 0.6, hits: 3, brk: 1, cd: 3, ms: 1100, sfx: 'stab',
       d: ['防御を無視して敵1体に3連撃', 'Hit one enemy 3 times, ignoring armor'] },
 
@@ -10738,8 +10838,8 @@ var SFX = (function () {
       d: ['敵1体を攻撃し、次の行動を封じる（ボスは次の攻撃半減）', 'Attack one enemy and stop its next action (bosses: next attack halved)'] },
     w_storm: { job: 3, slot: 'type', n: ['ファイアストーム', 'Fire Storm'], tg: 'foes', pow: 1.0, fire: 1, ms: 1050, sfx: 'fire',
       d: ['敵全体を攻撃', 'Attack all enemies'] },
-    w_ult: { job: 3, slot: 'ult', n: ['サンダーストーム', 'Thunder Storm'], tg: 'foe', pow: 3.0, ult: 1, ms: 1450, sfx: 'thunder',
-      d: ['敵1体に特大ダメージ（戦闘ごとに1回）', 'Massive damage to one enemy (once per battle)'] },
+    w_ult: { job: 3, slot: 'ult', n: ['サンダーストーム', 'Thunder Storm'], tg: 'foe', pow: 2.1, ult: 1, ms: 1450, sfx: 'thunder',
+      d: ['ためて次の自分の番に放つ（その後2R使えない）', 'Charge, then unleash on your next turn (2-round cooldown after)'] },
     w_rank: { job: 3, slot: 'rank', n: ['ロイヤルフレア', 'Royal Flare'], tg: 'foes', pow: 1.2, cd: 3, ms: 1250, sfx: 'magic',
       d: ['敵全体を攻撃', 'Attack all enemies'] }
   };
@@ -10801,7 +10901,7 @@ var SFX = (function () {
     var j = JOBS[S.seats[i].job], p = S.pl[i];
     return {
       mhp: Math.round(j.hp * (1 + P.hpUp * p.hu) * (p.rank ? P.rankHp : 1)),
-      atk: Math.round(j.atk * (1 + P.atkUp * p.au) * (p.rank ? P.rankAtk : 1) * (p.it.sword ? P.swordMul : 1))
+      atk: Math.round(j.atk * P.heroAtk * (1 + P.atkUp * p.au) * (p.rank ? P.rankAtk : 1) * (p.it.sword ? P.swordMul : 1))
     };
   };
   E.hasSkill = function (S, i, slot) {
@@ -10835,7 +10935,7 @@ var SFX = (function () {
   E.CHEST = ['sword', 'ring', 'shield', 'rank', 'rank'];        // what the treasure chests hold, one per battle won
   function toDisc(S, X, now) {
     S.ph = 'disc'; S.enemy = X.plan[S.stage];
-    S.disc = { end: S.cfg.dsec > 0 ? now + S.cfg.dsec * 1000 : 0, t0: now, props: [], rdy: 0, pn: 0 };
+    S.disc = { end: S.cfg.dsec > 0 ? now + S.cfg.dsec * 1000 : 0, t0: now, pk: {}, pt: {}, auto: {}, fin: 0 };
     S.bat = null; S.rw = null;
   }
   function rankedCount(S) { var c = 0; for (var i = 0; i < 4; i++) if (S.pl[i].rank) c++; return c; }
@@ -10856,19 +10956,20 @@ var SFX = (function () {
     else if (L.k === 'rank') p.rank = 1;
     else p.it[L.k] = 1;
     S.loot = S.loot.filter(function (x) { return x.id !== li; });
-    S.disc.props = S.disc.props.filter(function (q) { return q.li !== li; });
+    delete S.disc.pk[li]; delete S.disc.pt[li];
     log(S, 'give', [k, L.k]);
   }
-  function checkProps(S) {
-    var d = S.disc;
-    for (var i = 0; i < d.props.length; i++) {
-      var q = d.props[i];
-      if (bits(q.yes) < P.passVotes) continue;
-      if (canGive(S, q.li, q.to)) give(S, q.li, q.to); else d.props.splice(i, 1);
-      d.rdy = 0;
-      return true;
-    }
-    return false;
+  /** every player points at one recipient per item; when 3 point at the same one, it is handed over */
+  function tally(arr) { var c = [0, 0, 0, 0], best = -1, i; for (i = 0; i < 4; i++) if (arr[i] >= 0) c[arr[i]]++; for (i = 0; i < 4; i++) if (c[i] && (best < 0 || c[i] > c[best])) best = i; return { c: c, best: best }; }
+  E.tally = tally;
+  function checkPicks(S) {
+    var d = S.disc, done = false;
+    S.loot.slice().forEach(function (L) {
+      var arr = d.pk[L.id]; if (!arr) return;
+      var t = tally(arr);
+      if (t.best >= 0 && t.c[t.best] >= P.passVotes && canGive(S, L.id, t.best)) { give(S, L.id, t.best); done = true; }
+    });
+    return done;
   }
   /** level-up choices for seat k: locked skills (the ultimate needs two others first) or 'stat' (HP and ATK up) */
   E.lvOptions = function (S, k) {
@@ -10890,24 +10991,17 @@ var SFX = (function () {
   function autoLevel(S, k) { var n = 8; while (S.pl[k].lvq > 0 && n-- > 0) levelUp(S, k, E.goodLevel(S, k), !S.seats[k].bot); }
   function discInput(S, X, k, inp, now) {
     var d = S.disc, i;
-    if (inp.t === 'give') {
-      if (!canGive(S, inp.li, inp.to)) return false;
-      d.props = d.props.filter(function (q) { return !(q.by === k && q.li === inp.li); });
-      d.props.push({ id: ++d.pn, by: k, li: inp.li, to: inp.to, yes: 1 << k, at: now });
-      checkProps(S);
+    if (inp.t === 'pick') {
+      if (!lootById(S, inp.li)) return false;
+      var to = inp.to === -1 ? -1 : inp.to;
+      if (to !== -1 && !canGive(S, inp.li, to)) return false;
+      var arr = d.pk[inp.li] || [-1, -1, -1, -1];
+      arr[k] = arr[k] === to ? -1 : to;
+      d.pk[inp.li] = arr; d.pt[inp.li] = now;
+      checkPicks(S);
       return true;
     }
-    if (inp.t === 'ungive') { d.props = d.props.filter(function (q) { return !(q.by === k && q.li === inp.li); }); return true; }
-    if (inp.t === 'vote') {
-      for (i = 0; i < d.props.length; i++) if (d.props[i].id === inp.id) {
-        if (inp.y) d.props[i].yes |= (1 << k); else d.props[i].yes &= ~(1 << k);
-        checkProps(S);
-        return true;
-      }
-      return false;
-    }
     if (inp.t === 'lv') return levelUp(S, k, inp.c);
-    if (inp.t === 'rdy') { if (inp.on) d.rdy |= (1 << k); else d.rdy &= ~(1 << k); return true; }
     return false;
   }
 
@@ -10934,37 +11028,34 @@ var SFX = (function () {
     return 'stat';
   };
 
-  function discTick(S, X, now, rng) {
-    var d = S.disc, changed = false, i, k;
-    var humans = 0, humansReady = 0;
-    for (k = 0; k < 4; k++) if (!isBot(S, k)) { humans++; if (d.rdy & (1 << k)) humansReady++; }
+  /** CPU players back the human favourite; untouched items get a sensible CPU suggestion after a while */
+  function botPicks(arr, S, now, since, humanFirst, suggest) {
+    var changed = false, k, hv = [-1, -1, -1, -1], all = true;
+    for (k = 0; k < 4; k++) if (!isBot(S, k)) { hv[k] = arr[k]; if (arr[k] < 0) all = false; }
+    var lead = tally(hv).best;
+    // CPU players back the people's favourite once every person has voted (or after a pause), so one fast vote cannot decide alone
     for (k = 0; k < 4; k++) {
       if (!isBot(S, k)) continue;
-      if (S.pl[k].lvq > 0) { autoLevel(S, k); changed = true; }
-      var delay = 1400 + k * 500;
-      for (i = 0; i < d.props.length; i++) if (!(d.props[i].yes & (1 << k)) && now - d.props[i].at >= delay) { d.props[i].yes |= (1 << k); changed = true; }
+      var want = lead >= 0 ? lead : suggest;
+      if (want >= 0 && arr[k] !== want && now - since >= (lead >= 0 ? (all ? 1200 : 8000) + k * 400 : humanFirst)) { arr[k] = want; changed = true; }
     }
-    if (changed && checkProps(S)) return true;
-    // loot nobody has proposed for: after a quiet spell the first CPU player makes a sensible proposal
-    var firstBot = -1;
-    for (k = 0; k < 4; k++) if (isBot(S, k)) { firstBot = k; break; }
-    if (firstBot >= 0 && now - d.t0 >= (humans === 0 ? 0 : 12000)) {
-      d.auto = d.auto || {};
-      for (i = 0; i < S.loot.length; i++) {
-        var L = S.loot[i];
-        if (d.auto[L.id] || d.props.some(function (q) { return q.li === L.id; })) continue;
-        d.auto[L.id] = 1;
-        var to = E.goodGive(S, L);
-        if (to >= 0) { discInput(S, X, firstBot, { t: 'give', li: L.id, to: to }, now); changed = true; break; }
-      }
-    }
-    var pending = d.props.length > 0;
-    for (k = 0; k < 4; k++) {
-      if (!isBot(S, k) || (d.rdy & (1 << k))) continue;
-      var go = humans > 0 ? humansReady === humans : !pending;
-      if (go) { d.rdy |= (1 << k); changed = true; }
-    }
-    if (d.rdy === 15 || (d.end && now >= d.end)) {
+    return changed;
+  }
+  function discTick(S, X, now, rng) {
+    var d = S.disc, changed = false, k, humans = 0;
+    for (k = 0; k < 4; k++) if (!isBot(S, k)) humans++;
+    for (k = 0; k < 4; k++) if (isBot(S, k) && S.pl[k].lvq > 0) { autoLevel(S, k); changed = true; }
+    S.loot.forEach(function (L) {
+      var arr = d.pk[L.id] || [-1, -1, -1, -1], none = arr.every(function (x) { return x < 0; });
+      var sug = none && now - d.t0 >= (humans ? 15000 : 600) ? E.goodGive(S, L) : -1;
+      if (botPicks(arr, S, now, none ? d.t0 : (d.pt[L.id] || d.t0), humans ? 15000 : 600, sug)) { d.pk[L.id] = arr; d.pt[L.id] = d.pt[L.id] || now; changed = true; }
+    });
+    if (checkPicks(S)) changed = true;
+    // finished when nothing is left to hand out and every level-up is chosen: the battle starts by itself
+    var open = S.loot.some(function (L) { for (var j = 0; j < 4; j++) if (canGive(S, L.id, j)) return true; return false; });
+    var lvLeft = false; for (k = 0; k < 4; k++) if (S.pl[k].lvq > 0) lvLeft = true;
+    if (!open && !lvLeft) { if (!d.fin) { d.fin = now; changed = true; } } else if (d.fin) { d.fin = 0; changed = true; }
+    if ((d.fin && now - d.fin >= 1800) || (d.end && now >= d.end)) {
       for (k = 0; k < 4; k++) autoLevel(S, k);          // unanswered level-ups are taken automatically
       startBattle(S, X, now, rng);
       return true;
@@ -10979,8 +11070,8 @@ var SFX = (function () {
     if (son) {
       // the awakening replaces the rank-up stat bonus with a smaller one, so a rank stone on the traitor is strong but not decisive
       var j = JOBS[S.seats[i].job], p = S.pl[i];
-      mhp = Math.round(P.son.hpBase + P.son.hpMul * j.hp * (1 + P.hpUp * p.hu));
-      atk = Math.round(j.atk * (1 + P.atkUp * p.au) * P.son.atk[S.seats[i].job] * (p.rank ? P.son.rankAtk : 1) * (p.it.sword ? P.swordMul : 1));
+      mhp = Math.round((P.son.hpBase + P.son.hpMul * j.hp * (1 + P.hpUp * p.hu)) * P.son.hpJob[S.seats[i].job]);
+      atk = Math.round(j.atk * P.heroAtk * (1 + P.atkUp * p.au) * P.son.atk[S.seats[i].job] * (p.rank ? P.son.rankAtk : 1) * (p.it.sword ? P.swordMul : 1));
     }
     return { hp: mhp, mhp: mhp, atk: atk, cd: {}, ult: 0, st: {} };
   }
@@ -10990,7 +11081,7 @@ var SFX = (function () {
     var en = EN[S.enemy], b, i;
     b = S.bat = { kind: 'pve', en: [], hs: [], rnd: 0, ord: [], ti: 0, g: -1, tele: [], evs: [], evn: 0, wait: now + 2200, end: 0, think: 0, over: null };
     for (i = 0; i < 4; i++) b.hs.push(newHero(S, i));
-    var ehp = Math.round(en.hp * ((en.sh && en.sh[S.stage]) || 1)), eatk = Math.round(en.atk * ((en.sa && en.sa[S.stage]) || 1));
+    var ehp = Math.round(en.hp * P.enHp * ((en.sh && en.sh[S.stage]) || 1)), eatk = Math.round(en.atk * ((en.sa && en.sa[S.stage]) || 1));
     for (i = 0; i < en.count; i++) b.en.push({ hp: ehp, mhp: ehp, atk: eatk, v: i % 3, st: {} });
     b.pp = (en.boss || en.last) ? ri(rng, en.pat.length) : 0;
     S.ph = 'battle';
@@ -11033,8 +11124,7 @@ var SFX = (function () {
     ['basic', 'p1', 'p2', 'type', 'ult', 'rank'].forEach(function (slot) {
       if (!E.hasSkill(S, k, slot)) return;
       var id = js[slot], sk = SK[id], ok = true, why = null;
-      if (sk.ult && h.ult) { ok = false; why = 'used'; }
-      else if (h.cd[id] > 0) { ok = false; why = 'cd'; }
+      if (h.cd[id] > 0) { ok = false; why = 'cd'; }
       out.push({ id: id, ok: ok, why: why, cd: h.cd[id] || 0 });
     });
     return out;
@@ -11061,6 +11151,8 @@ var SFX = (function () {
     if (sk.tg === 'ally') return allies(b, k);
     return [];
   };
+  /** the ultimate seat k is charging: { s, t } or null */
+  E.charging = function (S, k) { var b = S.bat; return (b && b.hs[k] && b.hs[k].st.chg) || null; };
   E.guardList = function (S, k) {
     var b = S.bat;
     if (S.seats[k].job !== 0) return [];
@@ -11093,10 +11185,12 @@ var SFX = (function () {
     // the King Shield turns away the first blows of every round
     if (u.blk > 0 && real === tgt) { u.blk--; rec.d = 0; rec.blk = 1; rec.hp = u.hp; if (real !== tgt) rec.rt = real; e.r.push(rec); return 0; }
     if (b.kind === 'final' && src === b.son) dmg *= P.son.ward * (1 + P.son.rage * Math.max(0, b.rnd - 1));
+    var capHp = (b.kind === 'final' && src === b.son && o.ult && real !== b.son) ? Math.round(u.mhp * P.sonUltCap) : 0;
     if (real >= 10 && !o.brk) dmg *= (1 - (EN[S.enemy].def || 0));
     if (u.st.shield) dmg *= P.shield;
     dmg = rollDamage(dmg, rng);
     if (o.crit) { dmg = Math.round(dmg * P.crit); rec.c = 1; }
+    if (capHp && dmg > capHp) dmg = capHp;
     u.hp = Math.max(0, u.hp - dmg);
     rec.d = dmg; rec.hp = u.hp; if (real !== tgt) rec.rt = real;
     if (u.hp <= 0) fall(S, b, real, u, rec);
@@ -11111,28 +11205,36 @@ var SFX = (function () {
     }
     return dmg;
   }
-  function atkOf(u) { return u.atk * (u.st.atkdn ? P.atkDown : 1); }
+  function atkOf(u) { return u.atk * (u.st.atkdn ? P.atkDown : 1) * (u.st.atkup ? P.enhMul : 1); }
 
   /** hero (or the Son) performs a skill. act = { s: skillId, t: targetRef, g: guardRef }. Returns false if illegal. */
   function heroAct(S, X, k, act, now, rng) {
     var b = S.bat, h = b.hs[k], sk = SK[act.s], i, e, tg;
     if (!sk || sk.job !== S.seats[k].job || !E.hasSkill(S, k, sk.slot)) return false;
-    if (sk.ult && h.ult) return false;
-    if (h.cd[sk.id] > 0) return false;
+    if (h.cd[sk.id] > 0 && !act.release) return false;
     if (sk.tg === 'foe') { tg = foes(b, k); if (tg.indexOf(act.t) < 0) return false; tg = [act.t]; }
     else if (sk.tg === 'ally') { tg = allies(b, k); if (tg.indexOf(act.t) < 0) return false; tg = [act.t]; }
     else if (sk.tg === 'foes') tg = foes(b, k);
+    else if (sk.tg === 'party') tg = allies(b, k);
     else tg = [k];
     // the knight (on the heroes' side) chooses whom to cover until his next turn
     if (S.seats[k].job === 0 && side(b, k) === 'h') {
       var gl = E.guardList(S, k);
       b.g = gl.indexOf(act.g) >= 0 ? act.g : -1;
     }
+    if (sk.ult && !act.release) {
+      // an ultimate is charged first: it goes off by itself on this hero's next turn, and everybody can see it coming
+      h.st.chg = { s: sk.id, t: sk.tg === 'foe' ? tg[0] : -1 };
+      ev(b, { k: 'chg', a: k, s: sk.id, t: h.st.chg.t });
+      b.wait = now + 1100; b.end = 0; b.think = 0; b.cur = -1; b.ti++;
+      return true;
+    }
+    if (act.release) delete h.st.chg;
     e = { k: 'act', a: k, s: sk.id, tg: tg.slice(), r: [] };
     if (b.kind === 'pve' && E.isEffective(S, sk.id)) e.w = 1;
     if (b.g >= 0 && S.seats[k].job === 0 && side(b, k) === 'h') e.g = b.g;
-    if (sk.ult) h.ult = 1;
-    if (sk.cd) h.cd[sk.id] = sk.cd + 1;
+    if (sk.ult) h.cd[sk.id] = P.ultCd + 1;
+    else if (sk.cd) h.cd[sk.id] = sk.cd + 1;
 
     if (sk.heal) {
       var a = unit(b, tg[0]), amt = Math.max(1, Math.round(atkOf(h) * sk.heal * (0.9 + rng() * 0.2)));
@@ -11151,7 +11253,8 @@ var SFX = (function () {
           var m2 = mul;
           if (sk.ult && tg[i] >= 10 && EN[S.enemy].ults && EN[S.enemy].ults.indexOf(sk.job) >= 0) { m2 *= P.weakUlt; e.w = 1; }
           var c = crit || (!sk.ult && rng() < (sk.crit || P.critBase));
-          hit(S, b, k, tg[i], atkOf(h) * sk.pow * m2, { single: sk.tg === 'foe', brk: sk.brk, crit: c }, e, rng);
+          var dealt = hit(S, b, k, tg[i], atkOf(h) * sk.pow * m2, { single: sk.tg === 'foe', brk: sk.brk, crit: c, ult: sk.ult }, e, rng);
+          if (sk.drain && dealt > 0 && h.hp > 0) { var hl = Math.min(h.mhp - h.hp, Math.max(1, Math.round(dealt * sk.drain))); if (hl > 0) { h.hp += hl; e.r.push({ t: k, h: hl, hp: h.hp }); } }
         }
         if (alive(b, tg[i])) {
           var t = unit(b, tg[i]);
@@ -11161,6 +11264,7 @@ var SFX = (function () {
       }
     } else if (sk.eff === 'shield') { h.st.shield = P.shieldRounds; e.r.push({ t: k, st: 'shield', hp: h.hp }); }
     else if (sk.eff === 'counter') { h.st.counter = 1; e.r.push({ t: k, st: 'counter', hp: h.hp }); }
+    else if (sk.eff === 'atkup') { tg.forEach(function (r) { unit(b, r).st.atkup = P.enhRounds; e.r.push({ t: r, st: 'atkup', hp: unit(b, r).hp }); }); }
     else if (sk.eff === 'power') { h.st.power = P.powerHits; e.r.push({ t: k, st: 'power', hp: h.hp }); }
     else if (sk.eff === 'stealth') { h.st.stealth = 1; e.r.push({ t: k, st: 'stealth', hp: h.hp }); }
     ev(b, e);
@@ -11244,6 +11348,7 @@ var SFX = (function () {
       }
       if (u.st.shield) u.st.shield--;
       if (u.st.atkdn) u.st.atkdn--;
+      if (u.st.atkup) u.st.atkup--;
       if (u.st.counter) u.st.counter = 0;
       if (u.cd) Object.keys(u.cd).forEach(function (id) { if (u.cd[id] > 0) u.cd[id]--; });
     });
@@ -11315,7 +11420,7 @@ var SFX = (function () {
       if (lu.hp / lu.mhp < 0.5) { act.s = can.p1; act.t = low; return act; }
     }
     // 2. defensive reactions to announced big moves
-    if (job === 0 && can.p1 && (teleOnMe || teleAoe || (act.g === teleTarget && teleTarget >= 0) || h.hp / h.mhp < 0.4) && !h.st.shield) { act.s = can.p1; act.t = k; return act; }
+    if (job === 0 && can.p1 && !h.st.atkup && (bossFight || totalFoeHp > h.atk * 6)) { act.s = can.p1; act.t = k; return act; }
     if (job === 3 && can.p2 && (teleAoe || teleTarget >= 0) && b.kind === 'pve') { act.s = can.p2; act.t = biggest; return act; }
     if (job === 2 && can.p1 && (teleOnMe || h.hp / h.mhp < 0.35) && !h.st.stealth) { act.s = can.p1; act.t = k; return act; }
     // 3. ultimate: on bosses as soon as it is set up; on big single mobs too
@@ -11342,7 +11447,7 @@ var SFX = (function () {
       }
     }
     if (job === 3 && can.p2 && bossFight && !asSon) { act.s = can.p2; act.t = biggest; return act; }
-    if (job === 0 && can.p2 && !h.st.counter && (act.g >= 0 || asSon) && rng() < 0.6) { act.s = can.p2; act.t = k; return act; }
+    if (job === 0 && can.p2) { act.s = can.p2; act.t = weakest; return act; }
     // 7. basic attack
     act.s = js.basic; act.t = weakest;
     return act;
@@ -11376,6 +11481,13 @@ var SFX = (function () {
     }
     var k = cur.h;
     if (!alive(b, k)) { b.ti++; return true; }
+    var chg = b.hs[k].st.chg;
+    if (chg) {
+      var cs = SK[chg.s], fsr = foes(b, k), tgt = chg.t;
+      if (cs.tg === 'foe' && fsr.indexOf(tgt) < 0) tgt = fsr.slice().sort(function (x, y) { return unit(b, y).hp - unit(b, x).hp; })[0];
+      if (!heroAct(S, X, k, { s: chg.s, t: tgt, g: b.g, release: 1 }, now, rng)) { delete b.hs[k].st.chg; b.ti++; }
+      return true;
+    }
     var turnId = b.rnd * 100 + b.ti;
     if (isBot(S, k)) {
       if (b.cur !== turnId) { b.cur = turnId; b.think = now + 900; b.end = 0; return true; }
@@ -11433,7 +11545,7 @@ var SFX = (function () {
   }
   /** after the rewards: a job-up vote if a job-up stone dropped, otherwise on to the next battle */
   function proceed(S, X, now) {
-    if (S.jsq > 0) { S.jsq--; S.ph = 'jobup'; S.ju = { end: now + P.juSec * 1000, t0: now, props: [], pn: 0 }; return; }
+    if (S.jsq > 0) { S.jsq--; S.ph = 'jobup'; S.ju = { end: now + P.juSec * 1000, t0: now, pk: [-1, -1, -1, -1], pt: 0 }; return; }
     if (EN[S.enemy].last) { S.ph = 'reveal'; S.son = X.traitor; S.rv = { end: now + 9000 }; return; }
     S.stage++;
     var nx = EN[X.plan[S.stage]];
@@ -11446,41 +11558,28 @@ var SFX = (function () {
   E.goodRank = function (S) { var o = [2, 1, 3, 0]; for (var i = 0; i < 4; i++) { var s = seatOfJob(S, o[i]); if (canRank(S, s)) return s; } return -1; };
   function evolve(S, k, now) { S.pl[k].rank = 1; S.pl[k].nw = (S.pl[k].nw || 0) | 16; log(S, 'rank', [k]); S.ju = null; S.ph = 'evolve'; S.evo = { to: k, end: now + P.evoSec * 1000 }; }
   function juCheck(S, now) {
-    var u = S.ju;
-    for (var i = 0; i < u.props.length; i++) if (bits(u.props[i].yes) >= P.passVotes && canRank(S, u.props[i].to)) { evolve(S, u.props[i].to, now); return true; }
+    var t = tally(S.ju.pk);
+    if (t.best >= 0 && t.c[t.best] >= P.passVotes && canRank(S, t.best)) { evolve(S, t.best, now); return true; }
     return false;
   }
   function juInput(S, k, inp, now) {
-    var u = S.ju, i;
-    if (inp.t === 'jprop') {
-      if (!canRank(S, inp.to)) return false;
-      u.props = u.props.filter(function (q) { return q.by !== k; });
-      u.props.push({ id: ++u.pn, by: k, to: inp.to, yes: 1 << k, at: now });
-      juCheck(S, now); return true;
-    }
-    if (inp.t === 'unjprop') { u.props = u.props.filter(function (q) { return q.by !== k; }); return true; }
-    if (inp.t === 'vote') {
-      for (i = 0; i < u.props.length; i++) if (u.props[i].id === inp.id) { if (inp.y) u.props[i].yes |= (1 << k); else u.props[i].yes &= ~(1 << k); juCheck(S, now); return true; }
-    }
-    return false;
+    var u = S.ju;
+    if (inp.t !== 'jpick') return false;
+    var to = inp.to === -1 ? -1 : inp.to;
+    if (to !== -1 && !canRank(S, to)) return false;
+    u.pk[k] = u.pk[k] === to ? -1 : to; u.pt = now;
+    juCheck(S, now); return true;
   }
   function juTick(S, X, now) {
-    var u = S.ju, k, i, changed = false, humans = 0, first = -1;
-    for (k = 0; k < 4; k++) { if (!isBot(S, k)) humans++; else if (first < 0) first = k; }
-    for (k = 0; k < 4; k++) {
-      if (!isBot(S, k)) continue;
-      for (i = 0; i < u.props.length; i++) if (!(u.props[i].yes & (1 << k)) && now - u.props[i].at >= 1400 + k * 500) { u.props[i].yes |= (1 << k); changed = true; }
-    }
-    if (changed && juCheck(S, now)) return true;
-    if (first >= 0 && !u.props.length && !u.auto && now - u.t0 >= (humans ? 10000 : 1500)) {
-      u.auto = 1; var to = E.goodRank(S);
-      if (to >= 0) { juInput(S, first, { t: 'jprop', to: to }, now); return true; }
-    }
+    var u = S.ju, k, humans = 0;
+    for (k = 0; k < 4; k++) if (!isBot(S, k)) humans++;
+    var none = u.pk.every(function (x) { return x < 0; }), wait = humans ? 12000 : 1500;
+    var changed = botPicks(u.pk, S, now, none ? u.t0 : u.pt, wait, none && now - u.t0 >= wait ? E.goodRank(S) : -1);
+    if (changed) u.pt = u.pt || now;
+    if (juCheck(S, now)) return true;
     if (now >= u.end) {
-      // time is up: the proposal with the most votes wins, otherwise a sensible choice
-      var best = null;
-      u.props.forEach(function (q) { if (canRank(S, q.to) && (!best || bits(q.yes) > bits(best.yes))) best = q; });
-      var pick = best ? best.to : E.goodRank(S);
+      // time is up: the most-picked candidate wins, otherwise a sensible choice
+      var t = tally(u.pk), pick = t.best >= 0 && canRank(S, t.best) ? t.best : E.goodRank(S);
       if (pick >= 0) evolve(S, pick, now); else { S.ju = null; proceed(S, X, now); }
       return true;
     }
@@ -11542,7 +11641,7 @@ var SFX = (function () {
     howto: ['あそびかた', 'How to play'],
     how1: ['4人がナイト・ファイター・アサシン・ウィザードを1つずつ担当します（空席はCPU）。', 'Four players take Knight, Fighter, Assassin and Wizard (empty seats are played by CPUs).'],
     how2: ['1人だけ「魔王の息子」（裏切り者）がいます。正体は本人しか知りません。', 'Exactly one player is the Son of the Demon King, the traitor. Only they know.'],
-    how3: ['戦闘の前に毎回「議論ターン」。次の敵を見ながら、戦利品（レベルアップの石・宝箱のアイテム）を誰に渡すか話し合います（3人の賛成で決定）。', 'Before every battle you negotiate: look at the next enemy and decide who gets the spoils (level-up stones, items from chests). 3 votes decide.'],
+    how3: ['戦闘の前に毎回「議論ターン」。次の敵を見ながら、戦利品（レベルアップの石・宝箱のアイテム）を誰に渡すか話し合います（同じ人に3票で決定）。', 'Before every battle you negotiate: look at the next enemy and decide who gets the spoils (level-up stones, items from chests). 3 votes decide.'],
     how4: ['戦闘に勝つと全員レベルアップ。「スキル解放」か「ステータスUP（HP・攻撃）」を選びます。石を受け取った人はもう一度選べます。', 'Every win levels everyone up: unlock a skill or raise HP and ATK. A level-up stone gives one more choice.'],
     how5: ['雑魚→雑魚→中ボス→雑魚→魔王の順に戦います。全滅したら全員の負けです。', 'Fight mob, mob, mid-boss, mob, then the Demon King. If the party falls, everyone loses.'],
     how6: ['魔王を倒すと裏切り者が覚醒し、最終戦「魔王の息子 対 残り3人」。勝った側の勝利です。', 'When the Demon King falls the traitor awakens: the Son against the other three. The winning side takes the game.'],
@@ -11559,13 +11658,13 @@ var SFX = (function () {
     ju_note: ['時間切れのときは賛成の多い案、なければCPUの判断で決まります。上級職はHPと攻撃が上がり、専用技を覚えます。', 'If time runs out, the proposal with the most votes wins. An advanced class gains HP, ATK and a new skill.'],
     chest_rank: ['ジョブアップの石が出た！', 'A Job-up Stone!'], rank_note: ['このあと専用のターンで、誰をジョブアップさせるか決めます', 'Next, you vote on who evolves'],
     evo_text: ['{0}は {1} に進化した！', '{0} evolved into {1}!'], evo_wait: ['{0}が進化している…', '{0} is evolving…'],
-    loot_sword: ['勇者の剣', 'Hero\'s Sword'], loot_sword_d: ['攻撃力 ×1.25', 'ATK ×1.25'],
-    loot_ring: ['金の指輪', 'Gold Ring'], loot_ring_d: ['一度だけ戦闘不能から復活', 'Revive once after falling'],
-    loot_shield: ['キングシールド', 'King Shield'], loot_shield_d: ['毎ラウンド最初の2回の攻撃を無効化（最終戦は1回）', 'Blocks the first 2 attacks each round (1 in the final)'],
+    loot_sword: ['勇者の剣', 'Hero\'s Sword'], loot_sword_d: ['攻撃力が1.25倍になる', 'ATK ×1.25'],
+    loot_ring: ['金の指輪', 'Gold Ring'], loot_ring_d: ['倒れても1回だけHP50%で復活', 'Once, stand back up with 50% HP after falling'],
+    loot_shield: ['キングシールド', 'King Shield'], loot_shield_d: ['毎ラウンド、最初に受ける攻撃1回を無効化', 'Blocks the first attack you take each round'],
     loot_title: ['戦利品の分配（3人の賛成で決定）', 'Share the spoils (3 votes decide)'], no_loot: ['分配する戦利品はありません', 'Nothing to share'],
     give_to: ['渡す相手：', 'Give to:'], prop_give: ['{0}の案：{1}へ', '{0}: to {1}'],
     lv_title: ['レベルアップ！ どちらかを選ぶ', 'Level up! Choose one'], lv_skill: ['スキル解放', 'Unlock a skill'], lv_stat: ['ステータスUP', 'Stats up'],
-    lv_stat_d: ['HP +{0}・攻撃 +{1}', 'HP +{0}, ATK +{1}'], lv_ult_lock: ['ウルトは他のスキルを2つ解放すると選べます', 'The ultimate opens after 2 other skills'],
+    lv_stat_d: ['HP +{0}・攻撃 +{1}', 'HP +{0}, ATK +{1}'], lv_ult_lock: ['ウルトは他のスキルを2つ覚えると選べます', 'The ultimate opens after 2 other skills'],
     lv_pending: ['残り{0}回', '{0} left'], lv_all: ['すべて解放済み', 'All unlocked'], or: ['または', 'or'], lv_up_chip: ['Lv UP', 'Lv UP'],
     chest_got: ['宝箱：{0}', 'Chest: {0}'], stones_got: ['レベルアップの石 ×{0}', 'Level-up Stone ×{0}'],
     spoils_note: ['戦利品は次の議論ターンで誰に渡すか決めます', 'You decide who gets the spoils in the next negotiation'],
@@ -11630,7 +11729,18 @@ var SFX = (function () {
     mv_bite: ['かみつき', 'Bite'], mv_fire: ['ヘルファイア', 'Hellfire'], mv_claw: ['ドラゴンクロー', 'Dragon Claw'], mv_breath: ['ファイアブレス', 'Fire Breath'],
     mv_tent: ['テンタクル', 'Tentacle'], mv_ink: ['インク', 'Ink'], mv_wave: ['タイダルウェーブ', 'Tidal Wave'], mv_dark: ['ダークオーブ', 'Dark Orb'], mv_doom: ['ドゥーム', 'Doom'],
     mv_demon_king_wave: ['ダークウェーブ', 'Dark Wave'],
-    st_shield: ['シールド', 'Shield'], st_counter: ['カウンター', 'Counter'], st_power: ['パワー', 'Power'], st_stealth: ['ステルス', 'Stealth'], st_poison: ['どく', 'Poison'],
+
+    eff_ring: ['倒れても1回復活', 'Revives once'], eff_shield: ['毎R 最初の攻撃1回を無効', 'Blocks 1 attack per round'],
+    no_skill: ['スキルなし', 'No skills yet'], cant_give: ['渡せません', 'Cannot take it'], picks_n: ['{0}票 / 3票で決定', '{0} of 3 votes'], picks_0: ['0票', '0 votes'], my_pick: ['あなたの票', 'Your vote'],
+    loot_title2: ['戦利品：渡したい人をタップ（同じ人に3票で決定）', 'Spoils: tap who should get it (3 votes on the same person decide)'],
+    disc_how: ['CPUは全員が投票した後（または8秒後）に一番人気の人へ票を合わせます。全部の戦利品が決まり、レベルアップも選び終わると自動で戦闘開始。もう一度タップで票を取り消せます。', 'Once every item is decided and every level-up chosen, the battle starts by itself. Tap again to take back your vote.'],
+    disc_fin: ['分配完了！ まもなく戦闘開始…', 'All set! The battle starts shortly…'],
+    ju_title2: ['ジョブアップの石を誰に使う？ タップで投票（同じ人に3票で決定）', 'Who evolves with the Job-up Stone? Tap to vote (3 votes on the same person decide)'],
+    ju_note2: ['時間切れのときは一番票の多い人、いなければCPUの判断で決まります。上級職はHPと攻撃が上がり、専用技を覚えます。', 'If time runs out, the most-voted player evolves (or the CPU decides). An advanced class gains HP, ATK and a new skill.'],
+    ult_need: ['🔒 あと{0}個スキルを覚えると選べる', '🔒 Learn {0} more skill(s) to unlock'], ult_lock_b: ['🔒 未解放：レベルアップでスキルをあと{0}個覚えると解放', '🔒 Locked: learn {0} more skill(s) by levelling up'],
+    chg_banner: ['{0}が{1}の力をためている！', '{0} is charging {1}!'], chg_at: ['（狙い：{0}）', ' (aimed at {0})'],
+    reconn: ['接続が切れています', 'You are disconnected'], reconn_b: ['再接続する', 'Reconnect'], reconn_d: ['押すとページを読み込み直し、同じ席に戻ります', 'Reloads the page and puts you back in your seat'],
+    st_shield: ['シールド', 'Shield'], st_atkup: ['攻撃UP', 'ATK up'], st_chg: ['チャージ中', 'Charging'], st_counter: ['カウンター', 'Counter'], st_power: ['パワー', 'Power'], st_stealth: ['ステルス', 'Stealth'], st_poison: ['どく', 'Poison'],
     st_frozen: ['こおり', 'Frozen'], st_chill: ['スロウ', 'Chilled'], st_atkdn: ['攻撃ダウン', 'ATK down'], st_guard: ['ガード中', 'Covered'],
 
     reward_title: ['勝利！', 'Victory!'], got_pts: ['共有ポイント +{0}', 'Shared points +{0}'],
@@ -11648,7 +11758,7 @@ var SFX = (function () {
     lg_alloc: ['{0}の案が成立：{1}', '{0}\'s split passed: {1}'], lg_buy: ['{0}が {1} を解放', '{0} unlocked {1}'], lg_rank: ['{0}がジョブアップ：{1}', '{0} evolved: {1}'],
     lg_expire: ['時間切れ：{0}ポイントが失効', 'Time up: {0} points expired'],
     sound_on: ['音：ON', 'Sound: on'], sound_off: ['音：OFF', 'Sound: off'], lang: ['English', '日本語'],
-    net_mqtt: ['ルーム {0} ・ {1}人 ・ v2', 'Room {0} ・ {1} here ・ v2'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
+    net_mqtt: ['ルーム {0} ・ {1}人 ・ v3', 'Room {0} ・ {1} here ・ v3'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
     code_title: ['ルームコードで集まる', 'Meet by room code'], code_make: ['ルームを作る（コードを発行）', 'Create a room (get a code)'], code_or: ['または 友達のコードで参加', 'or join with a friend\'s code'],
     code_ph: ['ルームコード（6文字）', 'Room code (6 letters)'], code_join: ['参加', 'Join'], code_bad: ['コードは英数字6文字です', 'The code is 6 letters or digits'],
     code_finding: ['ルーム {0} を探しています…', 'Looking for room {0}…'], code_none: ['ルームが見つかりません。コードを確かめるか、ホストが先に作っているか確認してください。', 'No room found. Check the code, and that the host has created it first.'],
@@ -11968,17 +12078,14 @@ var SFX = (function () {
     };
     if (S.ph === 'intro') { o.ok = S.ok; o.end = S.end; }
     if (S.ph === 'disc') {
-      o.disc = {
-        end: S.disc.end, rdy: S.disc.rdy,
-        props: S.disc.props.map(function (p) { return { id: p.id, by: p.by, li: p.li, to: p.to, yes: p.yes }; })
-      };
+      o.disc = { end: S.disc.end, pk: S.disc.pk, fin: S.disc.fin ? 1 : 0 };
     }
     if (S.bat && (S.ph === 'battle' || S.ph === 'final')) {
       var b = S.bat;
       o.bat = {
         kind: b.kind, son: b.son, rnd: b.rnd, cs: E.currentSeat(S), g: b.g, tele: b.tele, evn: b.evn, end: b.end, over: b.over, ti: b.ti,
         en: b.en.map(function (u) { return { hp: u.hp, mhp: u.mhp, v: u.v, st: flat(u.st) }; }),
-        hs: b.hs.map(function (h) { return { hp: h.hp, mhp: h.mhp, atk: h.atk, cd: h.cd, ult: h.ult, st: flat(h.st), blk: h.blk || 0 }; }),
+        hs: b.hs.map(function (h) { return { hp: h.hp, mhp: h.mhp, atk: h.atk, cd: h.cd, st: flat(h.st), blk: h.blk || 0 }; }),
         ord: b.ord.map(function (x) { return x.h !== undefined ? x.h : 10 + x.e; }),
         ev: JSON.stringify(b.evs.slice(-(evKeep || 3)))
       };
@@ -11986,7 +12093,7 @@ var SFX = (function () {
     if (S.ph === 'reward') o.rw = { st: S.rw.st, item: S.rw.item, end: S.rw.end, t0: S.rw.t0 };
     if (S.ph === 'reveal') o.rv = S.rv;
     if (S.ph === 'cutin') o.ci = S.ci;
-    if (S.ph === 'jobup') o.ju = { end: S.ju.end, props: S.ju.props.map(function (q) { return { id: q.id, by: q.by, to: q.to, yes: q.yes }; }) };
+    if (S.ph === 'jobup') o.ju = { end: S.ju.end, pk: S.ju.pk };
     if (S.ph === 'evolve') o.evo = S.evo;
     return o;
   }
@@ -12167,7 +12274,7 @@ var SFX = (function () {
 
   /* ------------------------------------------------------------ everyone */
   function setView(o, hostId) {
-    ROOM.view = o; ROOM.hostPeer = hostId; lastView = Date.now(); ROOM.hostGone = false;
+    ROOM.view = o; ROOM.hostPeer = hostId; lastView = Date.now(); ROOM.lastAt = lastView; ROOM.hostGone = false;
     ROOM.off = ROOM.isHost ? 0 : Date.now() - o.now;
     ROOM.mySeat = seatOf(o.L, NET.me.id);
     ROOM.joined = (o.L.players || []).some(function (p) { return p.pid === NET.me.id; });
@@ -12472,7 +12579,7 @@ var SFX = (function () {
     if (rec.miss) { popup(c, 'MISS', '#c8d3e6'); SCN.sfx('miss'); return; }
     if (rec.blk) { popup(c, 'BLOCK', '#8fc0f7'); SCN.sfx('guard'); if (a) { a.mv = { t0: now, dur: 200, dx: 0, dy: 0, jit: 1 }; } return; }
     if (rec.h !== undefined) { popup(c, '+' + rec.h, '#8fe3a0'); SCN.hp[ref] = rec.hp; SCN.sfx('heal'); if (SCN.onChange) SCN.onChange(); return; }
-    if (rec.st) { popup(c, rec.st === 'power' ? 'POWER UP' : rec.st.toUpperCase(), '#ffe9a0'); if (a) a.st[rec.st] = 1; if (rec.st === 'stealth' && a) a.alpha = 0.55; return; }
+    if (rec.st) { popup(c, rec.st === 'power' ? 'POWER UP' : rec.st === 'atkup' ? 'ATK UP' : rec.st.toUpperCase(), '#ffe9a0'); if (a) a.st[rec.st] = 1; if (rec.st === 'stealth' && a) a.alpha = 0.55; return; }
     if (rec.g !== undefined) { var o = SCN.pos(rec.t); FX.spawn('k_guard', { x: o.x, y: o.y, sx: o.x, sy: o.y, seed: 3 }, now); SCN.sfx('guard'); }
     if (rec.ctr !== undefined) { var k = SCN.pos(rec.ctr); FX.spawn('k_counter', { x: c.x, y: c.y, sx: k.x, sy: k.y, seed: 5 }, now); }
     var onHero = ref < 10 && ref !== sonSeat;
@@ -12535,6 +12642,13 @@ var SFX = (function () {
       setPose(a, 'attack', 420, now); lunge(a, false, now);
       SCN.sfx(mv.sfx);
       dur = 200 + castFx(mv.fx, e, src, now, now + 200) + 300;
+    } else if (e.k === 'chg') {
+      a = unitActor(e.a); src = SCN.pos(e.a);
+      if (SCN.onBanner) SCN.onBanner({ k: 'chg', a: e.a, s: e.s, t: e.t });
+      if (a) { a.st.chg = 1; a.flash = 0.7; setPose(a, a.def.poses.cast === undefined ? 'attack' : 'cast', 700, now); }
+      popup(src, 'CHARGE', '#ffb43a', true);
+      FX.spawn('rankup', { x: src.x, y: src.y, sx: src.x, sy: src.y, seed: e.n * 7 }, now);
+      SCN.sfx('buff'); dur = 1100;
     } else if (e.k === 'skip') {
       popup(SCN.pos(e.a), 'FROZEN', '#b0e0f5'); SCN.sfx('ice'); dur = 650;
     } else if (e.k === 'dot') {
@@ -12659,7 +12773,7 @@ var SFX = (function () {
     refs.forEach(function (r) {
       var a = unitActor(r);
       if (!a || a.gone || a.down || !a.st) return;
-      var c = SCN.pos(r), map = { poison: 'st_poison', frozen: 'st_freeze', chill: 'st_freeze', power: 'st_buff', shield: 'st_shield', counter: 'st_shield', stealth: 'st_stealth' };
+      var c = SCN.pos(r), map = { poison: 'st_poison', frozen: 'st_freeze', chill: 'st_freeze', power: 'st_buff', atkup: 'st_buff', chg: 'st_chg', shield: 'st_shield', counter: 'st_shield', stealth: 'st_stealth' };
       Object.keys(map).forEach(function (k) {
         var d = FX.defs[map[k]];
         if (a.st[k] && d) { try { d.draw(fb, (now % d.dur) / d.dur, { x: c.x, y: c.y, sx: c.x, sy: c.y, targets: [c], seed: r + 1, power: 1 }); } catch (e) { /* cosmetic */ } }
@@ -12805,6 +12919,22 @@ var SFX = (function () {
     rc.hidden = !(ui.roleOpen && seated && !$('b-role').hidden);
     if (!rc.hidden) swap(rc, [roleCard(S, false)]);
   }
+  /** the rescue button: shown when this player is marked OFF, the host's updates stopped arriving, or the server link is down */
+  var offSince = 0;
+  function renderReconn() {
+    var S = cur(), k = me(), now = Date.now(), bad = false;
+    if (S && k >= 0 && S.seats[k] && S.seats[k].off) bad = true;
+    if (S && !ROOM.isHost && ROOM.lastAt && now - ROOM.lastAt > 9000) bad = true;
+    if (NET.mode === 'mqtt' && NET.room && !NET.online) { offSince = offSince || now; if (now - offSince > 4000) bad = true; } else offSince = 0;
+    var el = $('reconn');
+    if (!el) {
+      el = h('div', { id: 'reconn', class: 'reconn', hidden: true });
+      doc.body.appendChild(el);
+    }
+    if (!changed('reconn', [bad, root.LANG])) return;
+    el.hidden = !bad;
+    if (bad) swap(el, [h('b', { text: T('reconn') }), btn('b-reconn', T('reconn_b'), function () { try { root.location.reload(); } catch (e) { /* ignore */ } }, { cls: 'primary' }), h('span', { class: 'dim', text: T('reconn_d') })]);
+  }
   function roleCard(S, withOk) {
     var r = ROOM.role, kids = [h('div', { class: 'eyebrow', text: T('role_title') })];
     if (r === null) kids.push(h('p', { text: T('role_wait') }));
@@ -12845,7 +12975,6 @@ var SFX = (function () {
       kids.push(h('div', { class: 'dots' }, dots));
       var marks = Object.keys(p.it || {}).map(function (it) { var c = icon(it, 16); c.title = lootName(it) + (p.it[it] === 2 ? ' ✕' : ''); if (p.it[it] === 2) c.style.opacity = '.35'; return c; });
       if (p.lvq > 0) marks.push(h('span', { class: 'chip lvq', text: T('lv_up_chip') }));
-      if (S.ph === 'disc' && (S.disc.rdy & (1 << i))) marks.push(h('span', { class: 'chip ok', text: T('ready') }));
       if (S.ph === 'intro' && (S.ok & (1 << i))) marks.push(h('span', { class: 'chip ok', text: T('ok') }));
 
       kids.push(h('div', { class: 'chips' }, marks));
@@ -12856,7 +12985,7 @@ var SFX = (function () {
     var S = cur(), el = $('party');
     if (!S) { if (changed('party', 'none')) { el.textContent = ''; el.hidden = true; } return; }
     var b = S.bat, inB = !!b && (S.ph === 'battle' || S.ph === 'final');
-    var data = [S.ph, S.seats, S.pl, inB ? [0, 1, 2, 3].map(function (i) { return [SCN.hp[i], b.hs[i].mhp, b.hs[i].st]; }) : 0, S.disc ? S.disc.rdy : 0, S.ok || 0,
+    var data = [S.ph, S.seats, S.pl, inB ? [0, 1, 2, 3].map(function (i) { return [SCN.hp[i], b.hs[i].mhp, b.hs[i].st]; }) : 0, 0, S.ok || 0,
       S.ph === 'disc' ? S.loot : 0, inB ? b.cs : -1, inB ? b.g : -1, me(), root.LANG, S.son];
     if (!changed('party', data)) return;
     el.hidden = false;
@@ -13064,6 +13193,7 @@ var SFX = (function () {
   function icon(k, px) { var c = SCN.thumb('item', k, 0, 1); c.className = 'px icon'; c.style.width = c.style.height = (px || 20) + 'px'; return c; }
   function lootName(k) { return T('loot_' + k); }
   /** the level-up choice: unlock one locked skill, or HP and ATK up */
+  function ultLeft(S, k) { var p = S.pl[k], n = 0; ['p1', 'p2', 'type'].forEach(function (sl) { if (p.sk & E.BIT[sl]) n++; }); return Math.max(0, E.P.ultNeed - n); }
   function lvPicker(S, k) {
     var p = S.pl[k], o = E.lvOptions(S, k), js = E.JOB_SKILLS[S.seats[k].job], j = E.JOBS[S.seats[k].job];
     var hpUp = Math.round(j.hp * E.P.hpUp * (p.rank ? E.P.rankHp : 1)), atkUp = Math.max(1, Math.round(j.atk * E.P.atkUp * (p.rank ? E.P.rankAtk : 1)));
@@ -13072,7 +13202,7 @@ var SFX = (function () {
       return h('button', { id: 'b-lv' + sl, type: 'button', class: 'btn choice' + (sl === 'ult' ? ' ult' : ''), disabled: !ok, title: ok ? N(sk.d) : T('lv_ult_lock'),
         onclick: function () { SFX.init(); SFX.play('levelup'); ROOM.send({ t: 'lv', c: sl }); } },
         [h('span', { class: 'sk-slot', text: T('slot_' + sl) }), h('b', {}, [N(sk.n), powerText(js[sl], E.heroStats(S, k).atk) ? h('span', { class: 'sk-pow', text: powerText(js[sl], E.heroStats(S, k).atk) }) : null]),
-          h('span', { class: 'sk-desc', text: ok ? N(sk.d) : T('lv_ult_lock') })]);
+          h('span', { class: 'sk-desc', text: ok ? N(sk.d) : T('ult_need', ultLeft(S, k)) })]);
     });
     return h('div', { class: 'lvpick' }, [
       h('div', { class: 'eyebrow', text: T('lv_title') + (p.lvq > 1 ? '（' + T('lv_pending', p.lvq) + '）' : '') }),
@@ -13085,34 +13215,72 @@ var SFX = (function () {
       ])
     ]);
   }
-  function lootRow(S, L) {
-    var d = S.disc, k = me(), seated = k >= 0, props = d.props.filter(function (q) { return q.li === L.id; });
-    var mineQ = null; props.forEach(function (q) { if (q.by === k) mineQ = q; });
-    var kids = [h('div', { class: 'loot-h' }, [icon(L.k, 22), h('b', { text: lootName(L.k) }), h('span', { class: 'dim', text: T('loot_' + L.k + '_d') })])];
-    if (seated) kids.push(h('div', { class: 'giveto' }, [h('span', { class: 'dim', text: T('give_to') })].concat([0, 1, 2, 3].map(function (j) {
-      var ok = E.canGive(S, L.id, j), on = mineQ && mineQ.to === j;
-      return h('button', { type: 'button', class: 'btn sm' + (on ? ' on' : ''), disabled: !ok, 'aria-pressed': String(!!on),
-        onclick: function () { SFX.init(); SFX.play('ui_ok'); ROOM.send(on ? { t: 'ungive', li: L.id } : { t: 'give', li: L.id, to: j }); } }, seatName(S, j));
-    }))));
-    props.forEach(function (q) {
-      var voted = seated && (q.yes & (1 << k)), mine = q.by === k;
-      kids.push(h('div', { class: 'prop' }, [h('span', { class: 'prop-by', text: T('prop_give', seatName(S, q.by), seatName(S, q.to)) }), voteDots(S, q.yes),
-        h('span', { class: 'dim', text: T('votes', bitsOf(q.yes)) }),
-        !seated || mine ? null : btn('b-v' + q.id, T(voted ? 'agreed' : 'agree'), function () { ROOM.send({ t: 'vote', id: q.id, y: voted ? 0 : 1 }); }, { cls: voted ? 'sm' : 'primary sm', pressed: !!voted })]));
+  /** what an item would do for seat j, as a short "before → after" line */
+  function lootEffect(S, kind, j) {
+    var st = E.heroStats(S, j), p = S.pl[j];
+    if (kind === 'sword') return T('atk') + ' ' + st.atk + '→' + Math.round(st.atk * E.P.swordMul);
+    if (kind === 'ring') return T('eff_ring');
+    if (kind === 'shield') return T('eff_shield');
+    if (kind === 'lv') return T('lv', p.lv + p.lvq) + '→' + T('lv', p.lv + p.lvq + 1);
+    return '';
+  }
+  function skillChips(S, j) {
+    var p = S.pl[j], js = E.JOB_SKILLS[S.seats[j].job], out = [];
+    ['p1', 'p2', 'type', 'ult'].forEach(function (sl) { if (p.sk & E.BIT[sl]) out.push(h('span', { class: 'sk-chip' + (sl === 'ult' ? ' ult' : ''), text: skillName(js[sl]) })); });
+    if (p.rank) out.push(h('span', { class: 'sk-chip rk', text: skillName(js.rank) }));
+    if (!out.length) out.push(h('span', { class: 'dim', text: T('no_skill') }));
+    Object.keys(p.it || {}).forEach(function (it) { if (p.it[it] === 1) { var c = icon(it, 16); c.title = lootName(it); out.push(c); } });
+    return out;
+  }
+  /** the vote table: one status column per character, then one row per thing to hand out.
+      rows: [{ head: [nodes], arr: [pick per seat], ok(j), eff(j), pick(j), id }] */
+  function voteTable(S, rows) {
+    var k = me(), cells = [h('div', { class: 'vt-corner' })];
+    [0, 1, 2, 3].forEach(function (j) {
+      var hs = E.heroStats(S, j);
+      cells.push(h('div', { class: 'vt-who' + (j === k ? ' me' : '') }, [
+        h('span', { class: 'c-top' }, [h('b', { class: 'c-nm', text: seatName(S, j) }), j === k ? h('span', { class: 'tag you', text: T('you') }) : null]),
+        h('span', { class: 'c-job', text: jobName(S, j) + ' ' + T('lv', S.pl[j].lv) }),
+        h('span', { class: 'c-job', text: 'HP ' + hs.mhp + ' ・ ' + T('atk') + ' ' + hs.atk }),
+        h('span', { class: 'c-sk' }, skillChips(S, j))]));
     });
-    return h('div', { class: 'loot' }, kids);
+    rows.forEach(function (r) {
+      cells.push(h('div', { class: 'vt-item' }, r.head));
+      [0, 1, 2, 3].forEach(function (j) {
+        var on = k >= 0 && r.arr[k] === j, n = 0, ok = r.ok(j);
+        for (var i = 0; i < 4; i++) if (r.arr[i] === j) n++;
+        cells.push(h('button', { id: r.id + '-' + j, type: 'button', class: 'vt-vote' + (on ? ' on' : '') + (n >= 2 ? ' hot' : ''), disabled: !ok || k < 0, 'aria-pressed': String(on),
+          title: [0, 1, 2, 3].filter(function (i) { return r.arr[i] === j; }).map(function (i) { return seatName(S, i); }).join('・'), onclick: function () { SFX.init(); SFX.play('ui_ok'); r.pick(j); } },
+          [h('span', { class: 'c-eff', text: ok ? r.eff(j) : T('cant_give') }),
+            h('span', { class: 'c-vote' }, [h('span', { class: 'vdots' }, [0, 1, 2, 3].map(function (i) { return h('i', { class: r.arr[i] === j ? 'on' : '' }); })),
+              h('span', { class: 'c-n' + (n ? ' some' : ''), text: on ? T('my_pick') : n ? T('picks_n', n) : '' })])]));
+      });
+    });
+    return h('div', { class: 'vtable' }, cells);
   }
   function panelDisc(S) {
     var d = S.disc, k = me(), seated = k >= 0, kids = [];
     kids.push(h('div', { class: 'head' }, [h('h2', { text: T('disc_title', S.stage + 1) }), h('span', { class: 'time' }, [T('time_left') + ' ', timer(d.end)])]));
     if (seated && S.pl[k].lvq > 0) kids.push(lvPicker(S, k));
-    kids.push(h('div', { class: 'eyebrow', text: T('loot_title') }));
-    kids.push(S.loot.length ? h('div', { class: 'loots' }, S.loot.map(function (L) { return lootRow(S, L); })) : h('p', { class: 'dim', text: T('no_loot') }));
-    kids.push(h('div', { class: 'grow' }));
-    if (seated) {
-      var rdy = !!(d.rdy & (1 << k));
-      kids.push(btn('b-rdy', T(rdy ? 'unready' : 'ready'), function () { ROOM.send({ t: 'rdy', on: rdy ? 0 : 1 }); }, { cls: rdy ? 'big' : 'primary big', pressed: rdy, title: T('ready_note2') }));
-    } else kids.push(h('p', { class: 'dim', text: T('spectate') }));
+    if (S.loot.length) {
+      kids.push(h('div', { class: 'eyebrow', text: T('loot_title2') }));
+      kids.push(voteTable(S, S.loot.map(function (L) {
+        return { id: 'v' + L.id, arr: d.pk[L.id] || [-1, -1, -1, -1], head: [icon(L.k, 22), h('span', { class: 'vt-txt' }, [h('b', { class: 'loot-nm', text: lootName(L.k) }), h('span', { class: 'loot-d', text: T('loot_' + L.k + '_d') })])],
+          ok: function (j) { return E.canGive(S, L.id, j); }, eff: function (j) { return lootEffect(S, L.k, j); }, pick: function (j) { ROOM.send({ t: 'pick', li: L.id, to: j }); } };
+      })));
+    } else kids.push(h('p', { class: 'dim', text: T('no_loot') }));
+    kids.push(h('p', { class: 'dim', text: d.fin ? T('disc_fin') : seated ? T('disc_how') : T('spectate') }));
+    return [h('div', { class: 'box fill' }, kids)];
+  }
+  function panelJobup(S) {
+    var u = S.ju;
+    var kids = [h('div', { class: 'head' }, [h('h2', {}, [icon('rank', 22), ' ' + T('loot_rank')]), h('span', { class: 'time' }, [T('time_left') + ' ', timer(u.end)])]),
+      h('p', { class: 'lead', text: T('ju_title2') })];
+    kids.push(voteTable(S, [{ id: 'ju', arr: u.pk, head: [icon('rank', 22), h('span', { class: 'vt-txt' }, [h('b', { class: 'loot-nm', text: T('loot_rank') }), h('span', { class: 'loot-d', text: T('loot_rank_d') })])],
+      ok: function (j) { return E.canRank(S, j); },
+      eff: function (j) { var job = E.JOBS[S.seats[j].job]; return '→' + N(job.rn) + '・' + skillName(E.JOB_SKILLS[S.seats[j].job].rank); },
+      pick: function (j) { ROOM.send({ t: 'jpick', to: j }); } }]));
+    kids.push(h('p', { class: 'dim', text: T('ju_note2') }));
     return [h('div', { class: 'box fill' }, kids)];
   }
   function panelIntro(S) {
@@ -13133,6 +13301,7 @@ var SFX = (function () {
     ui.picks = [];
     if (!mine || busy) return [h('div', { class: 'box' }, [head, h('p', { class: 'dim', text: k < 0 ? T('spectate') : T('watching') })])];
     var list = E.skillList(S, k), kids = [head];
+    if (!(S.pl[k].sk & E.BIT.ult)) list = list.concat([{ id: E.JOB_SKILLS[S.seats[k].job].ult, ok: false, why: 'lock' }]);
     kids.push(h('div', { class: 'skills' }, list.map(function (o) {
       var sk = E.SK[o.id], sel = ui.skill === o.id, eff = b.kind === 'pve' && E.isEffective(S, o.id), pw = powerText(o.id, b.hs[k].atk);
       return h('button', { id: 'sk-' + o.id, type: 'button', class: 'skill' + (sel ? ' sel' : '') + (sk.ult ? ' ult' : '') + (sk.slot === 'rank' ? ' rank' : '') + (eff ? ' eff' : ''), disabled: !o.ok, 'aria-pressed': String(sel),
@@ -13140,7 +13309,7 @@ var SFX = (function () {
       [h('span', { class: 'sk-top' }, [h('span', { class: 'sk-slot', text: T('slot_' + sk.slot) }), eff ? h('span', { class: 'eff-tag', text: T('eff_tag') }) : null]),
         h('span', { class: 'sk-name' }, [N(sk.n), pw ? h('span', { class: 'sk-pow', text: pw }) : null,
           (S.pl[k].nw & (sk.slot === 'rank' ? 16 : (E.BIT[sk.slot] || 0))) ? h('span', { class: 'new-tag', text: 'NEW' }) : null]),
-        h('span', { class: 'sk-desc', text: o.ok ? N(sk.d) : o.why === 'used' ? T('used') : T('cd_left', o.cd) })]);
+        h('span', { class: 'sk-desc', text: o.ok ? N(sk.d) : o.why === 'lock' ? T('ult_lock_b', ultLeft(S, k)) : T('cd_left', o.cd) })]);
     })));
     var need = false;
     if (ui.skill) {
@@ -13179,26 +13348,6 @@ var SFX = (function () {
     }
     return [h('div', { class: 'box fill' }, kids)];
   }
-  function panelJobup(S) {
-    var u = S.ju, k = me(), seated = k >= 0;
-    var mineQ = null; u.props.forEach(function (q) { if (q.by === k) mineQ = q; });
-    var kids = [h('div', { class: 'head' }, [h('h2', {}, [icon('rank', 22), ' ' + T('loot_rank')]), h('span', { class: 'time' }, [T('time_left') + ' ', timer(u.end)])]),
-      h('p', { class: 'lead', text: T('ju_title') })];
-    kids.push(h('div', { class: 'jucands' }, [0, 1, 2, 3].map(function (j) {
-      var ok = E.canRank(S, j), on = mineQ && mineQ.to === j, job = E.JOBS[S.seats[j].job];
-      return h('button', { type: 'button', class: 'btn jucand' + (on ? ' on' : ''), disabled: !seated || !ok, 'aria-pressed': String(!!on),
-        onclick: function () { SFX.init(); SFX.play('ui_ok'); ROOM.send(on ? { t: 'unjprop' } : { t: 'jprop', to: j }); } },
-        [h('span', { class: 'ju-who', text: seatName(S, j) }), h('span', { class: 'ju-evo' }, [N(job.n), ' → ', h('b', { text: N(job.rn) })])]);
-    })));
-    u.props.forEach(function (q) {
-      var voted = seated && (q.yes & (1 << k));
-      kids.push(h('div', { class: 'prop' }, [h('span', { class: 'prop-by', text: T('prop_give', seatName(S, q.by), seatName(S, q.to)) }), voteDots(S, q.yes),
-        h('span', { class: 'dim', text: T('votes', bitsOf(q.yes)) }),
-        !seated || q.by === k ? null : btn('b-jv' + q.id, T(voted ? 'agreed' : 'agree'), function () { ROOM.send({ t: 'vote', id: q.id, y: voted ? 0 : 1 }); }, { cls: voted ? 'sm' : 'primary sm', pressed: !!voted })]));
-    });
-    kids.push(h('p', { class: 'dim', text: T('ju_note') }));
-    return [h('div', { class: 'box fill' }, kids)];
-  }
   function panelReveal(S) {
     return [h('div', { class: 'box center' }, [h('p', { class: 'lead', text: T('reveal_1') }), h('p', { class: 'role-name traitor', text: T('reveal_2', seatName(S, S.son), jobName(S, S.son)) }), h('p', { class: 'dim', text: T('reveal_3') })])];
   }
@@ -13225,7 +13374,7 @@ var SFX = (function () {
       var b = S.bat, k = me();
       var tk = b.rnd * 100 + b.ti;
       if (ui.turnKey !== S.stage + ':' + tk) { ui.turnKey = S.stage + ':' + tk; ui.skill = null; ui.target = -1; ui.guard = b.g; if (b.cs === k && k >= 0) SFX.play('turn'); }
-      key = ['bat', b.cs, b.over, b.rnd, b.ti, b.end, SCN.busy(), ui.skill, ui.target, ui.guard, ui.sent, k, root.LANG, b.cs === k ? [SCN.hp, b.hs[k].cd, b.hs[k].ult] : 0];
+      key = ['bat', b.cs, b.over, b.rnd, b.ti, b.end, SCN.busy(), ui.skill, ui.target, ui.guard, ui.sent, k, root.LANG, b.cs === k ? [SCN.hp, b.hs[k].cd] : 0];
       if (!changed('panel', key)) return;
       kids = panelBattle(S);
     } else if (S.ph === 'reward') { key = ['rw', S.rw, S.pl, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelReward(S); }
@@ -13298,10 +13447,11 @@ var SFX = (function () {
     else if (o.k === 'round') { $('round').textContent = T('round', o.r); return; }
     else if (o.k === 'act') txt = T('uses', unitName(S, o.a), skillName(o.s)) + (o.w ? ' ' + T('weak_hit') : '');
     else if (o.k === 'en') txt = T('uses', unitName(S, o.a), moveName(S.enemy, o.m));
+    else if (o.k === 'chg') txt = T('chg_banner', unitName(S, o.a), skillName(o.s)) + (o.t >= 0 ? T('chg_at', unitName(S, o.t)) : '');
     else if (o.k === 'tele') txt = o.t >= 0 ? T('tele_one', unitName(S, o.a), seatName(S, o.t)) : T('tele_all', unitName(S, o.a));
     else if (o.k === 'over') { txt = T(o.w === 'win' ? 'win' : 'lose'); SFX.play(o.w === 'win' ? 'victory' : 'defeat'); }
     if (!txt) return;
-    showBanner(txt, o.k === 'tele' ? 2600 : o.k === 'start' ? 2200 : 1500, o.k === 'tele' ? 'warn' : o.k === 'over' ? 'big' : (o.k === 'act' && o.w) ? 'eff' : '');
+    showBanner(txt, o.k === 'tele' || o.k === 'chg' ? 2600 : o.k === 'start' ? 2200 : 1500, o.k === 'tele' || o.k === 'chg' ? 'warn' : o.k === 'over' ? 'big' : (o.k === 'act' && o.w) ? 'eff' : '');
   };
   SCN.onChange = function () { renderParty(); renderPlates(); };
   SCN.sfx = function (name) { SFX.play(name); };
@@ -13423,6 +13573,7 @@ var SFX = (function () {
       if (NET.mode === 'mqtt' && !ROOM.view) renderPanel();
       if (S && (S.ph === 'battle' || S.ph === 'final')) { renderPanel(); renderHot(); }
       renderTop();
+      renderReconn();
       if (ui.diag) {
         var v = ROOM.view, hd = ROOM.debug();
         $('diagbox').textContent = ['mode: ' + NET.mode + (NET.pending ? ' (connecting)' : ''), 'online: ' + NET.online, 'people here: ' + (NET.peers().length + 1),
