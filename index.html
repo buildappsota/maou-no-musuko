@@ -11814,7 +11814,7 @@ var SFX = (function () {
     lg_alloc: ['{0}の案が成立：{1}', '{0}\'s split passed: {1}'], lg_buy: ['{0}が {1} を解放', '{0} unlocked {1}'], lg_rank: ['{0}がジョブアップ：{1}', '{0} evolved: {1}'],
     lg_expire: ['時間切れ：{0}ポイントが失効', 'Time up: {0} points expired'],
     sound_on: ['音：ON', 'Sound: on'], sound_off: ['音：OFF', 'Sound: off'], lang: ['English', '日本語'],
-    net_mqtt: ['ルーム {0} ・ {1}人 ・ v4', 'Room {0} ・ {1} here ・ v4'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
+    net_mqtt: ['ルーム {0} ・ {1}人 ・ v5', 'Room {0} ・ {1} here ・ v5'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
     code_title: ['ルームコードで集まる', 'Meet by room code'], code_make: ['ルームを作る（コードを発行）', 'Create a room (get a code)'], code_or: ['または 友達のコードで参加', 'or join with a friend\'s code'],
     code_ph: ['ルームコード（6文字）', 'Room code (6 letters)'], code_join: ['参加', 'Join'], code_bad: ['コードは英数字6文字です', 'The code is 6 letters or digits'],
     code_finding: ['ルーム {0} を探しています…', 'Looking for room {0}…'], code_none: ['ルームが見つかりません。コードを確かめるか、ホストが先に作っているか確認してください。', 'No room found. Check the code, and that the host has created it first.'],
@@ -12620,7 +12620,11 @@ var SFX = (function () {
     if (queue.length > 6) flush();
   }
   /** true while battle animations are still playing (the command menu waits for this). */
-  SCN.busy = function (now) { return queue.length > 0 || (now || root.performance.now()) < busyUntil; };
+  SCN.busy = function (now) {
+    now = now || root.performance.now();
+    if (now - lastNow > 1500) return false;     // the animation loop is not running (tab in the background): never keep the menu locked
+    return queue.length > 0 || now < busyUntil;
+  };
   function flush() { queue = []; timers = []; busyUntil = 0; syncUnits(); }
 
   /* ---------------------------------------------------------------- playback of battle events */
@@ -12778,6 +12782,7 @@ var SFX = (function () {
   }
   function frame(tNow) {
     var now = tNow, i;
+    if (lastNow && now - lastNow > 1500) flush();           // back from the background: skip the animations that piled up, show the real state
     lastNow = now;
     // due timers, then the next queued event
     if (timers.length) {
@@ -13352,14 +13357,18 @@ var SFX = (function () {
   function panelIntro(S) {
     return [h('div', { class: 'box center' }, [me() >= 0 ? roleCard(S, true) : h('p', { class: 'dim', text: T('spectate') }), h('span', { class: 'time' }, timer(S.end))])];
   }
+  /** identifies one turn of one battle (the stage is part of it, so a number from an earlier battle can never match) */
+  function turnTag(S) { return S.stage + ':' + (S.bat.rnd * 100 + S.bat.ti); }
+  /** my action was sent for this very turn and the host has not moved on yet (a lost input is offered again after 4 s) */
+  function sentHere(S) { return ui.sent === turnTag(S) && Date.now() - (ui.sentAt || 0) < 4000; }
   function sendAct() {
     var S = cur(), sk = E.SK[ui.skill];
     ROOM.send({ t: 'act', s: ui.skill, x: (sk.tg === 'foe' || sk.tg === 'ally') ? ui.target : -1, g: ui.guard });
-    ui.skill = null; ui.target = -1; ui.sent = S.bat.rnd * 100 + S.bat.ti;
+    ui.skill = null; ui.target = -1; ui.sent = turnTag(S); ui.sentAt = Date.now();
     render();
   }
   function panelBattle(S) {
-    var b = S.bat, k = me(), cs = b.cs, busy = SCN.busy(), mine = cs === k && k >= 0 && !b.over && ui.sent !== b.rnd * 100 + b.ti;
+    var b = S.bat, k = me(), cs = b.cs, busy = SCN.busy(), mine = cs === k && k >= 0 && !b.over && !sentHere(S);
     var head = h('div', { class: 'head' }, [
       h('h2', { text: b.over ? T(b.over === 'win' ? 'win' : 'lose') : mine ? T('your_turn') : cs >= 0 ? T('turn_of', seatName(S, cs)) : T('enemy_turn') }),
       h('span', { class: 'time' }, [T('round', Math.max(1, b.rnd)), mine && b.end ? ' ・ ' : null, mine && b.end ? timer(b.end) : null])
@@ -13440,7 +13449,7 @@ var SFX = (function () {
       var b = S.bat, k = me();
       var tk = b.rnd * 100 + b.ti;
       if (ui.turnKey !== S.stage + ':' + tk) { ui.turnKey = S.stage + ':' + tk; ui.skill = null; ui.target = -1; ui.guard = b.g; if (b.cs === k && k >= 0) SFX.play('turn'); }
-      key = ['bat', b.cs, b.over, b.rnd, b.ti, b.end, SCN.busy(), ui.skill, ui.target, ui.guard, ui.sent, k, root.LANG, b.cs === k ? [SCN.hp, b.hs[k].cd] : 0];
+      key = ['bat', b.cs, b.over, b.rnd, b.ti, b.end, SCN.busy(), ui.skill, ui.target, ui.guard, ui.sent, sentHere(S), k, root.LANG, b.cs === k ? [SCN.hp, b.hs[k].cd] : 0];
       if (!changed('panel', key)) return;
       kids = panelBattle(S);
     } else if (S.ph === 'reward') { key = ['rw', S.rw, S.pl, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelReward(S); }
