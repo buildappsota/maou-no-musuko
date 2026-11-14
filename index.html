@@ -529,7 +529,7 @@ button.buy:disabled { opacity: .42; cursor: default; }
     <span id="net" class="net"></span>
     <span class="grow"></span>
     <button id="b-role" type="button" class="tbtn" hidden></button>
-    <button id="b-diag" type="button" class="tbtn"></button>
+    <button id="b-diag" type="button" class="tbtn" hidden></button>
     <span id="rolechip" class="rolechip" hidden></span>
     <button id="b-copy" type="button" class="tbtn" hidden></button>
     <button id="b-exit" type="button" class="tbtn" hidden></button>
@@ -10933,7 +10933,7 @@ var SFX = (function () {
         powerMul: 1.5, powerHits: 3, stealthMul: 1.6, poisonDot: 0.4, poisonRounds: 4,
     chill: 0.5, counterPow: 0.8, atkDown: 0.75, atkDownRounds: 2, weakUlt: 2.0,
     // the traitor's "awakening" in the final battle: HP = hpBase + hpMul x own HP, ATK x atk[job], acts per round, AoE damage factor
-    son: { hpBase: 720, hpMul: 2, hpJob: [0.75, 1, 1, 1], atk: [1.39, 1.86, 1.3, 2.12], rankAtk: 1.06, acts: 2, aoe: 0.55, ward: 0.55, rage: 0.06, cap: 30 },   // cap: the final ends after this many rounds (higher remaining HP share wins). rage: the Son hits harder every round, so the fight always ends
+    son: { hpBase: 720, hpMul: 2, hpJob: [0.75, 1, 1, 1], atk: [1.39, 1.78, 1.34, 1.39], rankAtk: 1.06, acts: 2, aoe: 0.55, ward: 0.55, rage: 0.06, cap: 30 },   // cap: the final ends after this many rounds (higher remaining HP share wins). rage: the Son hits harder every round, so the fight always ends
     discSec: 90, turnSec: 10, lvSec: 10, introSec: 25, cutSec: 5, juSec: 60, evoSec: 6
   };
 
@@ -10950,57 +10950,57 @@ var SFX = (function () {
   // tg: foe (one enemy) | foes (all enemies) | self | ally (one ally incl. self)
   // pow: damage = ATK x pow.  ms: animation length.  cd: rounds before it can be used again.
   var SK = E.SK = {
-    k_charge: { job: 0, slot: 'basic', n: ['チャージ', 'Charge'], tg: 'foe', pow: 1.0, ms: 420, sfx: 'slash',
-      d: ['敵1体を攻撃', 'Attack one enemy'] },
+    k_charge: { job: 0, slot: 'basic', n: ['チャージ', 'Charge'], tg: 'foe', pow: 0.95, ms: 420, sfx: 'slash',
+      d: ['敵1体への基本の一撃', 'A plain strike on one enemy'] },
     k_enhance: { job: 0, slot: 'p1', n: ['エンハンス', 'Enhance'], tg: 'party', cd: 3, eff: 'atkup', ms: 760, sfx: 'buff',
-      d: ['味方全員の攻撃力を2ラウンドの間 ×1.3', 'All allies deal x1.3 damage for 2 rounds'] },
-    k_holy: { job: 0, slot: 'p2', n: ['ホーリースラッシュ', 'Holy Slash'], tg: 'foe', pow: 1.1, cd: 2, drain: 0.2, ms: 560, sfx: 'slash',
-      d: ['敵1体を攻撃し、与えたダメージの20%回復', 'Attack one enemy and heal 20% of the damage dealt'] },
-    k_break: { job: 0, slot: 'type', n: ['ブレイクソード', 'Break Sword'], tg: 'foe', pow: 1.0, brk: 1, ms: 640, sfx: 'break',
-      d: ['防御を無視して敵1体を攻撃', 'Attack one enemy, ignoring armor'] },
+      d: ['味方全員の攻撃力 ×1.3（2R）。長丁場やボス戦の頭に', 'All allies x1.3 ATK for 2 rounds. Open long fights with it'] },
+    k_holy: { job: 0, slot: 'p2', n: ['ホーリースラッシュ', 'Holy Slash'], tg: 'foe', pow: 1.15, cd: 2, drain: 0.2, ms: 560, sfx: 'slash',
+      d: ['敵1体を攻撃し、与えたダメージの20%回復。削られたときに', 'Hit one enemy and heal 20% of the damage dealt'] },
+    k_break: { job: 0, slot: 'type', n: ['ブレイクソード', 'Break Sword'], tg: 'foe', pow: 1.4, brk: 1,cd: 2, ms: 640, sfx: 'break',
+      d: ['防御無視の重い一撃。ゴーレム・リザードマン向け', 'Heavy armor-piercing hit. Best against armored foes'] },
     k_ult: { job: 0, slot: 'ult', n: ['ジャッジメント', 'Judgment'], tg: 'foe', pow: 2.9, ult: 1, ms: 1400, sfx: 'ult',
       d: ['ためて次の自分の番に放つ（その後2R使えない）', 'Charge, then unleash on your next turn (2-round cooldown after)'] },
-    k_rank: { job: 0, slot: 'rank', n: ['ドラゴンブレス', 'Dragon Breath'], tg: 'foes', pow: 1.2, cd: 3, ms: 1100, sfx: 'fire',
-      d: ['敵全体を攻撃', 'Attack all enemies'] },
+    k_rank: { job: 0, slot: 'rank', n: ['ドラゴンブレス', 'Dragon Breath'], tg: 'foes', pow: 1.25, cd: 3, ms: 1100, sfx: 'fire',
+      d: ['敵全体を攻撃。群れ向け', 'Hit every enemy. Best against packs'] },
 
-    f_smash: { job: 1, slot: 'basic', n: ['スマッシュ', 'Smash'], tg: 'foe', pow: 1.0, ms: 380, sfx: 'punch',
-      d: ['敵1体を攻撃', 'Attack one enemy'] },
+    f_smash: { job: 1, slot: 'basic', n: ['スマッシュ', 'Smash'], tg: 'foe', pow: 1.1, ms: 380, sfx: 'punch',
+      d: ['敵1体への力強い基本の一撃', 'A strong plain strike on one enemy'] },
     f_power: { job: 1, slot: 'p1', n: ['パワー', 'Power'], tg: 'self', cd: 3, eff: 'power', ms: 700, sfx: 'buff',
-      d: ['次の3回の攻撃が1.5倍', 'Your next 3 attacks deal x1.5'] },
-    f_combo: { job: 1, slot: 'p2', n: ['コンボ', 'Combo'], tg: 'foe', pow: 0.5, hits: 3, cd: 2, ms: 760, sfx: 'punch',
-      d: ['敵1体に3連撃', 'Hit one enemy 3 times'] },
-    f_blaze: { job: 1, slot: 'type', n: ['ブレイズウェーブ', 'Blaze Wave'], tg: 'foes', pow: 1.0, fire: 1, ms: 950, sfx: 'fire',
-      d: ['敵全体を攻撃', 'Attack all enemies'] },
+      d: ['次の3回の攻撃が1.5倍。連撃やウルトの前に', 'Next 3 attacks x1.5. Use before combos and ultimates'] },
+    f_combo: { job: 1, slot: 'p2', n: ['コンボ', 'Combo'], tg: 'foe', pow: 0.55, hits: 3, cd: 2, ms: 760, sfx: 'punch',
+      d: ['敵1体に3連撃。クリティカルを狙える', 'Hit one enemy 3 times, 3 chances to crit'] },
+    f_blaze: { job: 1, slot: 'type', n: ['ブレイズウェーブ', 'Blaze Wave'], tg: 'foes', pow: 0.9, fire: 1,cd: 1, ms: 950, sfx: 'fire',
+      d: ['炎で敵全体を攻撃。ゴブリン・スケルトン向け', 'Fire on every enemy. Best against goblins and skeletons'] },
     f_ult: { job: 1, slot: 'ult', n: ['メテオスマッシュ', 'Meteor Smash'], tg: 'foe', pow: 2.2, ult: 1, ms: 1400, sfx: 'ult',
       d: ['ためて次の自分の番に放つ（その後2R使えない）', 'Charge, then unleash on your next turn (2-round cooldown after)'] },
-    f_rank: { job: 1, slot: 'rank', n: ['チャンピオンラッシュ', 'Champion Rush'], tg: 'foe', pow: 0.36, hits: 5, cd: 3, ms: 1100, sfx: 'punch',
-      d: ['敵1体に5連撃', 'Hit one enemy 5 times'] },
+    f_rank: { job: 1, slot: 'rank', n: ['チャンピオンラッシュ', 'Champion Rush'], tg: 'foe', pow: 0.38, hits: 5, cd: 3, ms: 1100, sfx: 'punch',
+      d: ['敵1体に5連撃。ボス向け', 'Hit one enemy 5 times. Best against bosses'] },
 
-    a_stab: { job: 2, slot: 'basic', n: ['バックスタブ', 'Backstab'], tg: 'foe', pow: 1.0, crit: 0.25, ms: 360, sfx: 'stab',
-      d: ['敵1体を攻撃（25%でクリティカル）', 'Attack one enemy (25% critical)'] },
+    a_stab: { job: 2, slot: 'basic', n: ['バックスタブ', 'Backstab'], tg: 'foe', pow: 0.85, crit: 0.35, ms: 360, sfx: 'stab',
+      d: ['敵1体を攻撃。クリティカル率35%', 'Hit one enemy, 35% crit chance'] },
     a_stealth: { job: 2, slot: 'p1', n: ['ステルス', 'Stealth'], tg: 'self', cd: 3, eff: 'stealth', ms: 650, sfx: 'magic',
-      d: ['次の単体攻撃を回避し、次の攻撃が1.6倍', 'Evade the next single attack; your next attack deals x1.6'] },
-    a_poison: { job: 2, slot: 'p2', n: ['ポイズン', 'Poison'], tg: 'foe', pow: 0.5, cd: 2, eff: 'poison', ms: 750, sfx: 'poison',
-      d: ['敵1体を攻撃し、4ラウンド毒', 'Attack one enemy and poison it for 4 rounds'] },
-    a_break: { job: 2, slot: 'type', n: ['ブレイクエッジ', 'Break Edge'], tg: 'foe', pow: 1.0, brk: 1, ms: 620, sfx: 'break',
-      d: ['防御を無視して敵1体を攻撃', 'Attack one enemy, ignoring armor'] },
+      d: ['次の単体攻撃を回避し、次の攻撃が1.6倍。大技の前に', 'Dodge the next single attack; next hit x1.6'] },
+    a_poison: { job: 2, slot: 'p2', n: ['ポイズン', 'Poison'], tg: 'foe', pow: 0.45, cd: 2, eff: 'poison', ms: 750, sfx: 'poison',
+      d: ['敵1体を攻撃し4ラウンド毒。長引く敵向け', 'Hit and poison one enemy for 4 rounds'] },
+    a_break: { job: 2, slot: 'type', n: ['ブレイクエッジ', 'Break Edge'], tg: 'foe', pow: 1.2, brk: 1,crit: 0.5,cd: 2, ms: 620, sfx: 'break',
+      d: ['防御無視の急所突き。クリティカル率50%', 'Armor-piercing, 50% crit chance'] },
     a_ult: { job: 2, slot: 'ult', n: ['アサシネイト', 'Assassinate'], tg: 'foe', pow: 2.0, ult: 1, ms: 1450, sfx: 'ult',
       d: ['ためて次の自分の番に放つ（その後2R使えない）', 'Charge, then unleash on your next turn (2-round cooldown after)'] },
-    a_rank: { job: 2, slot: 'rank', n: ['シャドウダンス', 'Shadow Dance'], tg: 'foe', pow: 0.6, hits: 3, brk: 1, cd: 3, ms: 1100, sfx: 'stab',
-      d: ['防御を無視して敵1体に3連撃', 'Hit one enemy 3 times, ignoring armor'] },
+    a_rank: { job: 2, slot: 'rank', n: ['シャドウダンス', 'Shadow Dance'], tg: 'foe', pow: 0.62, hits: 3, brk: 1, cd: 3, ms: 1100, sfx: 'stab',
+      d: ['防御無視で敵1体に3連撃', 'Armor-piercing, hit one enemy 3 times'] },
 
-    w_bolt: { job: 3, slot: 'basic', n: ['マジックボルト', 'Magic Bolt'], tg: 'foe', pow: 1.0, ms: 520, sfx: 'magic',
-      d: ['敵1体を攻撃', 'Attack one enemy'] },
+    w_bolt: { job: 3, slot: 'basic', n: ['マジックボルト', 'Magic Bolt'], tg: 'foe', pow: 1.05, ms: 520, sfx: 'magic',
+      d: ['敵1体への基本の魔法', 'A plain spell on one enemy'] },
     w_heal: { job: 3, slot: 'p1', n: ['ヒール', 'Heal'], tg: 'ally', heal: 1.2, cd: 1, ms: 800, sfx: 'heal',
       d: ['味方1人のHPを回復', 'Restore one ally\'s HP'] },
-    w_freeze: { job: 3, slot: 'p2', n: ['フリーズ', 'Freeze'], tg: 'foe', pow: 0.6, cd: 3, eff: 'freeze', ms: 800, sfx: 'ice',
-      d: ['敵1体を攻撃し、次の行動を封じる（ボスは次の攻撃半減）', 'Attack one enemy and stop its next action (bosses: next attack halved)'] },
-    w_storm: { job: 3, slot: 'type', n: ['ファイアストーム', 'Fire Storm'], tg: 'foes', pow: 1.0, fire: 1, ms: 1050, sfx: 'fire',
-      d: ['敵全体を攻撃', 'Attack all enemies'] },
+    w_freeze: { job: 3, slot: 'p2', n: ['フリーズ', 'Freeze'], tg: 'foe', pow: 0.65, cd: 3, eff: 'freeze', ms: 800, sfx: 'ice',
+      d: ['敵1体を攻撃し、行動を封じる（ボスは次の攻撃半減）。大技の前に', 'Hit and stop one enemy (bosses: next attack halved)'] },
+    w_storm: { job: 3, slot: 'type', n: ['ファイアストーム', 'Fire Storm'], tg: 'foes', pow: 0.8, fire: 1,eff: 'burn', ms: 1050, sfx: 'fire',
+      d: ['炎で敵全体を攻撃し、2ラウンド延焼。群れ向け', 'Fire on every enemy, burning for 2 rounds'] },
     w_ult: { job: 3, slot: 'ult', n: ['サンダーストーム', 'Thunder Storm'], tg: 'foe', pow: 2.1, ult: 1, ms: 1450, sfx: 'thunder',
       d: ['ためて次の自分の番に放つ（その後2R使えない）', 'Charge, then unleash on your next turn (2-round cooldown after)'] },
-    w_rank: { job: 3, slot: 'rank', n: ['ロイヤルフレア', 'Royal Flare'], tg: 'foes', pow: 1.2, cd: 3, ms: 1250, sfx: 'magic',
-      d: ['敵全体を攻撃', 'Attack all enemies'] }
+    w_rank: { job: 3, slot: 'rank', n: ['ロイヤルフレア', 'Royal Flare'], tg: 'foes', pow: 1.35, cd: 3,brk: 1, ms: 1250, sfx: 'magic',
+      d: ['防御無視で敵全体を攻撃。硬い群れにも通る', 'Armor-piercing blast on every enemy'] }
   };
   Object.keys(SK).forEach(function (id) { SK[id].id = id; });
   var JS = E.JOB_SKILLS = [{}, {}, {}, {}];
@@ -11014,11 +11014,11 @@ var SFX = (function () {
     skeleton: { n: ['スケルトンの群れ', 'Skeleton Pack'], u: ['スケルトン', 'Skeleton'], art: 'skeleton', bg: 'graveyard', count: 4, hp: 175, atk: 26, def: 0, weak: 'fire', sh: [0.45, 0.31, 1, 1.24], sa: [1, 1, 1, 1],
       moves: { slash: { fx: 'e_slash', pow: 1, ms: 360, sfx: 'slash' }, arrow: { fx: 'e_arrow', pow: 0.9, low: 1, ms: 480, sfx: 'stab' } },
       pat: [['slash']], vpat: { 1: [['arrow']] } },
-    golem: { n: ['ゴーレム', 'Golem'], art: 'golem', bg: 'ruins', count: 1, hp: 416, atk: 29, def: 0.6, weak: 'sword', sh: [0.32, 0.3, 1, 1.4], sa: [1, 1.22, 1, 1.67],
+    golem: { n: ['ゴーレム', 'Golem'], art: 'golem', bg: 'ruins', count: 1, hp: 340, atk: 29, def: 0.4, weak: 'sword', sh: [0.32, 0.3, 1, 1.4], sa: [1, 1.22, 1, 1.67],
       moves: { fist: { fx: 'e_rockfist', pow: 1, ms: 600, sfx: 'heavy' }, quake: { fx: 'e_quake', pow: 0.6, aoe: 1, ms: 950, sfx: 'quake' },
         big: { fx: 'e_rockfist', pow: 2.1, tele: 1, ms: 600, sfx: 'heavy' } },
       pat: [['fist'], ['quake'], ['big']] },
-    lizardman: { n: ['リザードマン', 'Lizardman'], art: 'lizardman', bg: 'swamp', count: 1, hp: 400, atk: 19, def: 0.6, weak: 'sword', sh: [0.34, 0.31, 1, 1.4], sa: [1, 1.34, 1, 1.39],
+    lizardman: { n: ['リザードマン', 'Lizardman'], art: 'lizardman', bg: 'swamp', count: 1, hp: 400, atk: 19, def: 0.5, weak: 'sword', sh: [0.34, 0.31, 1, 1.4], sa: [1, 1.34, 1, 1.39],
       moves: { slash: { fx: 'e_slash', pow: 1, ms: 360, sfx: 'slash' }, tail: { fx: 'e_tail', pow: 0.7, aoe: 1, ms: 480, sfx: 'heavy' } },
       pat: [['slash', 'slash'], ['slash', 'slash'], ['tail', 'slash']] },
     heavy_orc: { boss: 1, n: ['ヘビーオーク', 'Heavy Orc'], art: 'heavy_orc', bg: 'fortress', count: 1, hp: 1050, atk: 47, def: 0, ults: [2, 3],
@@ -11417,6 +11417,7 @@ var SFX = (function () {
         }
         if (alive(b, tg[i])) {
           var t = unit(b, tg[i]);
+          if (sk.eff === 'burn') { t.st.poison = { n: 2, d: Math.max(1, Math.round(h.atk * P.poisonDot * 0.6)) }; e.st = 'poison'; }
           if (sk.eff === 'poison') { t.st.poison = { n: P.poisonRounds, d: Math.max(1, Math.round(h.atk * P.poisonDot * (b.kind === 'final' && k === b.son ? P.son.ward : 1))) }; e.st = 'poison'; }
           if (sk.eff === 'freeze') { if (isBoss(S, b, tg[i]) || tg[i] < 10) t.st.chill = 1; else t.st.frozen = 1; e.st = 'freeze'; }
         }
@@ -11822,7 +11823,7 @@ var SFX = (function () {
     loot_shield: ['キングシールド', 'King Shield'], loot_shield_d: ['毎ラウンド、最初に受ける攻撃1回を無効化', 'Blocks the first attack you take each round'],
     loot_title: ['戦利品の分配（3人の賛成で決定）', 'Share the spoils (3 votes decide)'], no_loot: ['分配する戦利品はありません', 'Nothing to share'],
     give_to: ['渡す相手：', 'Give to:'], prop_give: ['{0}の案：{1}へ', '{0}: to {1}'],
-    lv_title: ['レベルアップ！ どちらかを選ぶ', 'Level up! Choose one'], lv_skill: ['スキル解放', 'Unlock a skill'], lv_stat: ['ステータスUP', 'Stats up'],
+    lv_title: ['レベルアップ', 'Level up'], lv_skill: ['スキル解放', 'Unlock a skill'], lv_stat: ['ステータスUP', 'Stats up'],
     lv_stat_d: ['HP +{0}・攻撃 +{1}', 'HP +{0}, ATK +{1}'], lv_ult_lock: ['ウルトは他のスキルを2つ覚えると選べます', 'The ultimate opens after 2 other skills'],
     lv_pending: ['残り{0}回', '{0} left'], lv_all: ['すべて解放済み', 'All unlocked'], or: ['または', 'or'], lv_up_chip: ['Lv UP', 'Lv UP'],
     chest_got: ['宝箱：{0}', 'Chest: {0}'], stones_got: ['レベルアップの石 ×{0}', 'Level-up Stone ×{0}'],
@@ -11831,8 +11832,8 @@ var SFX = (function () {
     lg_stat_auto: ['時間切れ：{0}はステータスUPを自動で選択', 'Time up: {0} automatically took Stats up'],
     evo_skill_a: ['必殺技「', 'New special move: '], evo_skill_b: ['」を覚えた！', '!'],
     lg_give: ['{0}に{1}が渡された', '{0} received the {1}'],
-    lobby_random: ['ジョブは開始時にランダムで決まります', 'Jobs are dealt at random when the game starts'],
-    solo_pick: ['ひとりのときだけ、ジョブを選べます（選ばなければランダム）', 'Playing alone, you may choose a job (otherwise random)'],
+    lobby_random: ['ジョブはランダム', 'Jobs are random'],
+    solo_pick: ['ジョブを選べます（任意）', 'Pick a job (optional)'],
     full_fail: ['この画面では全画面にできません。ブラウザの全画面（F11 / Ctrl+Cmd+F）を使ってください', 'Fullscreen is blocked here. Use your browser\'s fullscreen (F11 / Ctrl+Cmd+F)'], sit: ['このジョブにする', 'Take this job'], stand: ['席を立つ', 'Leave seat'],
     cpu: ['CPU', 'CPU'], empty_cpu: ['空席（CPU）', 'Empty (CPU)'], you: ['あなた', 'You'], host: ['ホスト', 'Host'],
     start: ['ゲーム開始', 'Start game'],
@@ -11847,8 +11848,8 @@ var SFX = (function () {
     invite: ['仲間はこのページを開いて同じルームに入ります（共有メニューからメールで招待）。', 'Friends join by opening this page (invite them by email from the Share menu).'],
 
     role_title: ['あなたの正体', 'Your secret role'], role_v: ['平民（勇者パーティ）', 'Commoner (hero party)'], role_t: ['魔王の息子', 'Son of the Demon King'],
-    role_v_d: ['仲間と魔王を倒し、そのあと正体を現す「魔王の息子」を3人で討ち取れば勝利です。', 'Defeat the Demon King with your party, then beat the Son of the Demon King who reveals himself. The three of you win together.'],
-    role_t_d: ['正体を隠したまま魔王を倒してください（全滅すればあなたも敗北）。その後に覚醒し、1人で3人と戦います。石や宝箱のアイテム、ランクストーンを自分に集めるほど最終戦で有利になります。', 'Stay hidden and help defeat the Demon King (if the party falls, you lose too). Then you awaken and fight the other three alone. The more stones, chest items and rank stones you collect, the stronger you are at the end.'],
+    role_v_d: ['魔王を倒し、正体を現す魔王の息子を3人で討て。', 'Beat the Demon King, then beat his Son together.'],
+    role_t_d: ['正体を隠して魔王を倒し、最後に1人で3人と戦う。石やアイテムを自分に集めるほど有利。', 'Stay hidden, beat the Demon King, then fight the three alone. Hoard stones and items.'],
     role_wait: ['正体を受け取っています…', 'Receiving your role…'], ok: ['OK', 'OK'], role_peek: ['正体を見る', 'Show my role'], role_hide: ['かくす', 'Hide'],
     waiting_others: ['ほかのプレイヤーを待っています…', 'Waiting for the others…'],
     son_stats: ['覚醒後：HP {0}・攻撃 {1}・1ラウンドに2回行動', 'Awakened: HP {0}, ATK {1}, two actions per round'],
@@ -11890,13 +11891,13 @@ var SFX = (function () {
     mv_demon_king_wave: ['ダークウェーブ', 'Dark Wave'],
 
     eff_ring: ['復活1回', 'Revive x1'], eff_shield: ['毎R 1回無効', '1 block/R'],
-    no_skill: ['スキルなし', 'No skills yet'], cant_give: ['渡せません', 'Cannot take it'], picks_n: ['{0}票 / 3票で決定', '{0} of 3 votes'], picks_0: ['0票', '0 votes'], my_pick: ['あなたの票', 'Your vote'],
-    loot_title2: ['戦利品：渡したい人をタップ（同じ人に3票で決定）', 'Spoils: tap who should get it (3 votes on the same person decide)'],
+    no_skill: ['スキルなし', 'No skills yet'], cant_give: ['渡せません', 'Cannot take it'], picks_n: ['{0}/3', '{0}/3'], picks_0: ['0票', '0 votes'], my_pick: ['あなた', 'You'],
+    loot_title2: ['渡したい人をタップ（同じ人に3票で決定）', 'Tap who gets it (3 votes on one person decide)'],
     disc_how: ['CPUは全員が投票した後（または8秒後）に一番人気の人へ票を合わせます。全部の戦利品が決まり、レベルアップも選び終わると自動で戦闘開始。もう一度タップで票を取り消せます。', 'Once every item is decided and every level-up chosen, the battle starts by itself. Tap again to take back your vote.'],
     disc_fin: ['分配完了！ まもなく戦闘開始…', 'All set! The battle starts shortly…'],
-    ju_title2: ['ジョブアップの石を誰に使う？ タップで投票（同じ人に3票で決定）', 'Who evolves with the Job-up Stone? Tap to vote (3 votes on the same person decide)'],
+    ju_title2: ['ジョブアップする人をタップ（3票で決定）', 'Tap who evolves (3 votes decide)'],
     ju_note2: ['時間切れのときは一番票の多い人、いなければCPUの判断で決まります。上級職はHPと攻撃が上がり、専用技を覚えます。', 'If time runs out, the most-voted player evolves (or the CPU decides). An advanced class gains HP, ATK and a new skill.'],
-    ult_need: ['🔒 あと{0}個スキルを覚えると選べる', '🔒 Learn {0} more skill(s) to unlock'], ult_lock_b: ['🔒 未解放：レベルアップでスキルをあと{0}個覚えると解放', '🔒 Locked: learn {0} more skill(s) by levelling up'],
+    ult_need: ['🔒 あと{0}スキル', '🔒 {0} more skill(s)'], ult_lock_b: ['🔒 あと{0}スキルで解放', '🔒 {0} more skill(s) to unlock'],
     chg_banner: ['{0}が{1}の力をためている！', '{0} is charging {1}!'], chg_at: ['（狙い：{0}）', ' (aimed at {0})'],
     reconn: ['接続が切れています', 'You are disconnected'], reconn_b: ['再接続する', 'Reconnect'], reconn_d: ['押すとページを読み込み直し、同じ席に戻ります', 'Reloads the page and puts you back in your seat'],
     st_shield: ['シールド', 'Shield'], st_atkup: ['攻撃UP', 'ATK up'], st_chg: ['チャージ中', 'Charging'], st_counter: ['カウンター', 'Counter'], st_power: ['パワー', 'Power'], st_stealth: ['ステルス', 'Stealth'], st_poison: ['どく', 'Poison'],
@@ -11917,7 +11918,7 @@ var SFX = (function () {
     lg_alloc: ['{0}の案が成立：{1}', '{0}\'s split passed: {1}'], lg_buy: ['{0}が {1} を解放', '{0} unlocked {1}'], lg_rank: ['{0}がジョブアップ：{1}', '{0} evolved: {1}'],
     lg_expire: ['時間切れ：{0}ポイントが失効', 'Time up: {0} points expired'],
     sound_on: ['音：ON', 'Sound: on'], sound_off: ['音：OFF', 'Sound: off'], lang: ['English', '日本語'],
-    net_mqtt: ['ルーム {0} ・ {1}人 ・ v6', 'Room {0} ・ {1} here ・ v6'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
+    net_mqtt: ['ルーム {0} ・ {1}人 ・ v7', 'Room {0} ・ {1} here ・ v7'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
     code_title: ['ルームコードで集まる', 'Meet by room code'], code_make: ['ルームを作る（コードを発行）', 'Create a room (get a code)'], code_or: ['または 友達のコードで参加', 'or join with a friend\'s code'],
     code_ph: ['ルームコード（6文字）', 'Room code (6 letters)'], code_join: ['参加', 'Join'], code_bad: ['コードは英数字6文字です', 'The code is 6 letters or digits'],
     code_finding: ['ルーム {0} を探しています…', 'Looking for room {0}…'], code_none: ['ルームが見つかりません。コードを確かめるか、ホストが先に作っているか確認してください。', 'No room found. Check the code, and that the host has created it first.'],
@@ -13262,8 +13263,7 @@ var SFX = (function () {
         h('div', { class: 'job-art' }, SCN.thumb('hero', j.id, 0, 1)),
         h('div', { class: 'job-body' }, [
           h('div', { class: 'job-name', text: N(j.n, true) }),
-          h('div', { class: 'job-stat', text: 'HP ' + j.hp + ' ・ ' + T('atk') + ' ' + j.atk + ' ・ ' + T('type_' + j.type) }),
-          h('div', { class: 'job-sk', text: ['p1', 'p2', 'type', 'ult'].map(function (sl) { return N(E.SK[js[sl]].n); }).join('・') }),
+          h('div', { class: 'job-stat', text: 'HP ' + j.hp + ' ・ ' + T('atk') + ' ' + j.atk }),
           on ? h('div', { class: 'job-foot' }, h('span', { class: 'chip ok', text: T('picked') })) : null
         ])
       ];
@@ -13357,7 +13357,7 @@ var SFX = (function () {
     var en = E.EN[S.enemy], art = SCN.thumb('enemy', en.art, 0, 1);
     art.className = 'px foe-art'; art.style.width = ''; art.style.height = '';
     return h('div', { class: 'dv-foe' }, [h('div', { class: 'foe-pic' }, art), h('div', { class: 'foe-info' }, [
-      h('div', { class: 'foe-name' }, [h('span', { class: 'foe-eye', text: T('next_enemy') + ' ・ ' + T('stage', S.stage + 1) + '　' }), N(en.n, true) + (en.count > 1 ? ' ×' + en.count : '')]),
+      h('div', { class: 'foe-name' }, [h('span', { class: 'foe-eye', text: T('stage', S.stage + 1) + '　' }), N(en.n, true) + (en.count > 1 ? ' ×' + en.count : '')]),
       foeKey(S),
       h('div', { class: 'foe-mv', text: foeLines(S).concat([Object.keys(en.moves).map(function (m) { return moveName(S.enemy, m); }).join(' ・ ')]).join('　／　') })])]);
   }
@@ -13374,14 +13374,13 @@ var SFX = (function () {
       var sk = E.SK[js[sl]], ok = o.indexOf(sl) >= 0;
       return h('button', { id: 'b-lv' + sl, type: 'button', class: 'btn choice' + (sl === 'ult' ? ' ult' : ''), disabled: !ok, title: ok ? N(sk.d) : T('lv_ult_lock'),
         onclick: function () { SFX.init(); SFX.play('levelup'); ROOM.send({ t: 'lv', c: sl }); } },
-        [h('span', { class: 'sk-slot', text: T('slot_' + sl) }), h('b', {}, [N(sk.n), powerText(js[sl], E.heroStats(S, k).atk) ? h('span', { class: 'sk-pow', text: powerText(js[sl], E.heroStats(S, k).atk) }) : null]),
+        [h('b', {}, [N(sk.n), powerText(js[sl], E.heroStats(S, k).atk) ? h('span', { class: 'sk-pow', text: powerText(js[sl], E.heroStats(S, k).atk) }) : null]),
           h('span', { class: 'sk-desc', text: ok ? N(sk.d) : T('ult_need', ultLeft(S, k)) })]);
     });
     return h('div', { class: 'lvpick' }, [
       h('div', { class: 'eyebrow', text: T('lv_title') + (p.lvq > 1 ? '（' + T('lv_pending', p.lvq) + '）' : '') }),
       h('div', { class: 'lvcols' }, [
         h('div', { class: 'lvcol' }, [h('div', { class: 'lvh', text: T('lv_skill') }), skills.length ? h('div', { class: 'choices' }, skills) : h('p', { class: 'dim', text: T('lv_all') })]),
-        h('div', { class: 'lvor', text: T('or') }),
         h('div', { class: 'lvcol' }, [h('div', { class: 'lvh', text: T('lv_stat') }),
           h('button', { id: 'b-lvstat', type: 'button', class: 'btn choice stat', onclick: function () { SFX.init(); SFX.play('levelup'); ROOM.send({ t: 'lv', c: 'stat' }); } },
             [h('b', { text: T('lv_stat') }), h('span', { class: 'sk-desc', text: T('lv_stat_d', hpUp, atkUp) })])])
@@ -13473,7 +13472,7 @@ var SFX = (function () {
     var b = S.bat, k = me(), cs = b.cs, busy = SCN.busy(), mine = cs === k && k >= 0 && !b.over && !sentHere(S);
     var head = h('div', { class: 'head' }, [
       h('h2', { text: b.over ? T(b.over === 'win' ? 'win' : 'lose') : mine ? T('your_turn') : cs >= 0 ? T('turn_of', seatName(S, cs)) : T('enemy_turn') }),
-      h('span', { class: 'time' }, [T('round', Math.max(1, b.rnd)), mine && b.end ? ' ・ ' : null, mine && b.end ? timer(b.end) : null])
+      h('span', { class: 'time' }, [mine && b.end ? timer(b.end) : null])
     ]);
     ui.picks = [];
     if (!mine || busy) return [h('div', { class: 'box' }, [head, h('p', { class: 'dim', text: k < 0 ? T('spectate') : T('watching') })])];
@@ -13483,7 +13482,7 @@ var SFX = (function () {
       var sk = E.SK[o.id], sel = ui.skill === o.id, eff = b.kind === 'pve' && E.isEffective(S, o.id), pw = powerText(o.id, b.hs[k].atk);
       return h('button', { id: 'sk-' + o.id, type: 'button', class: 'skill' + (sel ? ' sel' : '') + (sk.ult ? ' ult' : '') + (sk.slot === 'rank' ? ' rank' : '') + (eff ? ' eff' : ''), disabled: !o.ok, 'aria-pressed': String(sel),
         onclick: function () { SFX.play('ui_move'); ui.skill = o.id; var tl = E.targetList(S, k, o.id); ui.target = tl.length === 1 ? tl[0] : (tl.indexOf(ui.target) >= 0 ? ui.target : -1); render(); } },
-      [h('span', { class: 'sk-top' }, [h('span', { class: 'sk-slot', text: T('slot_' + sk.slot) }), eff ? h('span', { class: 'eff-tag', text: T('eff_tag') }) : null]),
+      [h('span', { class: 'sk-top' }, [sk.ult || sk.slot === 'rank' ? h('span', { class: 'sk-slot', text: T('slot_' + sk.slot) }) : null, eff ? h('span', { class: 'eff-tag', text: T('eff_tag') }) : null]),
         h('span', { class: 'sk-name' }, [N(sk.n), pw ? h('span', { class: 'sk-pow', text: pw }) : null,
           (S.pl[k].nw & (sk.slot === 'rank' ? 16 : (E.BIT[sk.slot] || 0))) ? h('span', { class: 'new-tag', text: 'NEW' }) : null]),
         h('span', { class: 'sk-desc', text: o.ok ? N(sk.d) : o.why === 'lock' ? T('ult_lock_b', ultLeft(S, k)) : T('cd_left', o.cd) })]);
@@ -13501,7 +13500,7 @@ var SFX = (function () {
             onclick: function () { SFX.play('ui_move'); ui.target = r; render(); } }, [h('span', { text: unitName(S, r) }), bar(hp, m, r >= 10 || r === b.son ? 'e' : '')]);
         })));
       }
-    } else kids.push(h('p', { class: 'dim', text: T('pick_skill') + '　' + T('auto_note') }));
+    }
     var gl = E.guardList(S, k);
     if (S.seats[k].job === 0 && gl.length && E.side(b, k) === 'h') {
       if (ui.guard !== -1 && gl.indexOf(ui.guard) < 0) ui.guard = -1;
@@ -13518,7 +13517,7 @@ var SFX = (function () {
     var gains = [];
     if (rw.st) gains.push(h('span', { class: 'gain-i' }, [icon('lv', 22), T('stones_got', rw.st)]));
     if (rw.item) gains.push(h('span', { class: 'gain-i' + (rw.item === 'rank' ? ' rank' : '') }, [icon(rw.item, 22), rw.item === 'rank' ? T('chest_rank') : T('chest_got', lootName(rw.item))]));
-    if (gains.length) { kids.push(h('div', { class: 'gains' }, gains)); kids.push(h('p', { class: 'dim', text: rw.item === 'rank' ? T('rank_note') : T('spoils_note') })); }
+    if (gains.length) kids.push(h('div', { class: 'gains' }, gains));
     if (k >= 0) {
       if (S.pl[k].lvq > 0) kids.push(lvPicker(S, k));
       else kids.push(h('p', { class: 'dim', text: T('lv_done') + ' ・ ' + T('waiting_others') }));
