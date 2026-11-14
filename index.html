@@ -11845,7 +11845,7 @@ var SFX = (function () {
   function mqSchedule() { if (!mqPubT) mqPubT = root.setTimeout(mqPublish, 90); }
   function mqRebuild() {
     var list = [], now = Date.now();
-    Object.keys(mqTable).forEach(function (id) { if (now - mqTable[id].at > 9000) delete mqTable[id]; else list.push({ peer: id, p: mqTable[id].p }); });
+    Object.keys(mqTable).forEach(function (id) { if (now - mqTable[id].at > 20000) delete mqTable[id]; else list.push({ peer: id, p: mqTable[id].p }); });
     others = list; fire();
   }
   /** join (or create) the room with this code. */
@@ -11890,6 +11890,7 @@ var SFX = (function () {
     mqBeat = mqSweep = null; mqTable = {}; others = []; NET.online = false;
     if (!keep) { NET.room = ''; store('s', 'mm_code', null); fire(); }
   };
+  if (root.document && root.document.addEventListener) root.document.addEventListener('visibilitychange', function () { if (!root.document.hidden && mq) mqPublish(); });   // back from another app: announce ourselves at once
   NET.setName = function (nm) { NET.me.name = String(nm || '').slice(0, 12); store('l', 'mm_name', NET.me.name); store('s', 'mm_name', NET.me.name); };
 
   /* ---------------- SEAL: a message only one player can read (their role), sent through public presence ----------------
@@ -12097,7 +12098,7 @@ var SFX = (function () {
       if (!s.pid) continue;
       var pr = present[s.pid];
       if (pr) { s.seen = now; if (pr.nm && pr.nm.slice(0, 12) !== s.nm) { s.nm = pr.nm.slice(0, 12); changed = true; } }
-      var gone = !pr && now - s.seen > 6000;
+      var gone = !pr && now - s.seen > 15000;
       if (H.S) {
         if (H.S.seats[i].nm !== s.nm) { H.S.seats[i].nm = s.nm; changed = true; }
         if (!!H.S.seats[i].off !== gone) { H.S.seats[i].off = gone; changed = true; }
