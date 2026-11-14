@@ -11659,6 +11659,7 @@ var SFX = (function () {
     inv_code_how: ['友達に送ったコードを、友達が「コードで参加」に入力すると同じルームに入れます（同じファイルを開いてもらってください）。', 'Your friends open the same file, type this code under "Join" and they are in.'],
     inv_c1: ['① 画面右上の「共有」で、友達のメールアドレスを招待する（友達はClaudeにサインインが必要）', '1. Invite your friends by email with "Share" at the top right (they must sign in to Claude)'],
     inv_c2: ['② 友達が同じページを開くと、自動でこのロビーに入ります', '2. When they open this same page they join this lobby automatically'],
+    inv_open: ['コード版を開く', 'Open the code version'], inv_open_note: ['ルームを作って招待リンクを送るだけ。友達はタップで参加できます', 'Create a room and send the invite link: friends join with one tap'],
     inv_or: ['メールなし・アカウントなしで遊ぶなら', 'No email, no account?'], inv_dl: ['コード版ファイルをダウンロード', 'Download the code version'],
     inv_dl_note: ['このファイルを友達に送ると、ルームコードだけで集まれます（友達はファイルを開くだけ）', 'Send this file to your friends: they only need to open it and type the room code'],
     dl_ok: ['ダウンロードしました。このファイルを友達に送ってください', 'Downloaded. Send this file to your friends'], dl_none: ['ダウンロードできませんでした', 'Could not download'],
@@ -12854,7 +12855,7 @@ var SFX = (function () {
     if (NET.mode === 'claude') {
       return h('div', { class: 'invite' }, [
         h('div', { class: 'inv-h', text: T('inv_title') }), h('p', { text: T('inv_c1') }), h('p', { text: T('inv_c2') }),
-        root.MAOU_PACK ? h('div', { class: 'inv-dl' }, [h('span', { class: 'dim', text: T('inv_or') }), btn('b-dlpack', T('inv_dl'), downloadPack, { cls: 'sm' }), h('span', { class: 'dim', text: T('inv_dl_note') })]) : null]);
+        h('div', { class: 'inv-dl' }, [h('span', { class: 'dim', text: T('inv_or') }), h('a', { class: 'btn primary sm', href: 'https://buildappsota.github.io/maou-no-musuko/', target: '_blank', rel: 'noopener' }, T('inv_open')), h('span', { class: 'dim', text: T('inv_open_note') })])]);
     }
     return null;
   }
