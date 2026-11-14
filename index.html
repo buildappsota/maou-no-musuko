@@ -365,6 +365,61 @@ button.buy:disabled { opacity: .42; cursor: default; }
   .vt-item { grid-column: 1 / -1; }
 }
 
+/* vote screen: the characters step out and this covers the whole stage */
+.discov { position: absolute; inset: 0; z-index: 4; pointer-events: auto; display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; background: rgba(12, 9, 24, .86); backdrop-filter: blur(1px); overflow: hidden; font-size: 13px; }
+.discov[hidden] { display: none; }
+.discov .head { flex: none; }
+.dv-foe { flex: none; display: flex; gap: 10px; align-items: center; padding: 4px 8px; background: rgba(10, 8, 16, .75); border: 2px solid var(--red); }
+.dv-foe .foe-art { height: 54px; }
+.dv-foe .foe-info { gap: 2px; }
+.dv-foe .foe-name { font-size: 16px; }
+.dv-foe .foe-eye { font-size: 11px; }
+.dv-foe .foe-key { font-size: 13px; }
+.dv-foe .foe-mv { font-size: 11px; }
+.discov .vtable { flex: 1 1 auto; min-height: 0; align-content: start; }
+.discov .lvpick { flex: none; }
+.main.vote-mode .party { display: none; }
+.main.vote-mode .panel { display: none; }
+.main.vote-mode .left { flex: 1 1 auto; min-height: 0; }
+.main.vote-mode .stage-wrap { flex: 1 1 auto; min-height: 0; container-type: size; align-items: stretch; }
+.main.vote-mode .stage { width: 100% !important; height: 100% !important; aspect-ratio: auto; max-width: none; }
+.main.vote-mode .stage > canvas { object-fit: cover; }
+@media (min-aspect-ratio: 5/4) and (min-width: 760px) { .main.vote-mode { grid-template-rows: minmax(0, 1fr); grid-template-areas: "stage"; } .main.vote-mode .stage-wrap { grid-area: stage; } }
+.discov > .box { background: transparent; border: none; padding: 0; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.discov .vt-txt .loot-d { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
+.discov { background: rgba(12, 9, 24, .78); }
+@media (max-width: 620px) {
+  .discov { font-size: 12px; gap: 4px; padding: 6px; }
+  .discov h2 { font-size: 15px; }
+  .dv-foe { padding: 3px 6px; gap: 6px; }
+  .dv-foe .foe-art { height: 34px; }
+  .dv-foe .foe-name { font-size: 14px; }
+  .dv-foe .foe-key { font-size: 11px; padding: 1px 4px; }
+  .dv-foe .foe-mv { display: none; }
+  .discov .lvpick { padding: 4px 6px; gap: 3px; }
+  .discov .lvpick .sk-desc { display: none; }
+  .discov .lvpick .lvcols { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .discov .lvpick .lvor { display: none; }
+  .discov .lvpick .btn { min-height: 0; padding: 2px 6px; }
+  .discov .vt-item { flex-wrap: wrap; padding: 2px 5px; gap: 4px; }
+  .discov .vt-txt { flex-direction: row; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .discov .vt-who { padding: 2px 3px; }
+  .discov .c-job { font-size: 10px; }
+  .discov .c-eff { font-size: 11px; }
+  .discov .vt-vote { padding: 2px 3px; }
+  .discov .eyebrow { margin: 0; }
+}
+
+.c-job span { white-space: nowrap; }
+@media (max-width: 620px) {
+  .discov .dv-help { display: none; }
+  .discov .vt-item { flex-wrap: nowrap; }
+  .discov .vt-item .px.icon { flex: none; }
+  .discov .vt-txt .loot-d { font-size: 10px; padding: 0 4px; }
+  .discov .loot-nm { font-size: 13px; }
+  .discov .c-job { display: flex; flex-wrap: wrap; column-gap: 4px; }
+}
+
 </style>
 <div id="app" class="app">
   <header class="top">
@@ -388,6 +443,7 @@ button.buy:disabled { opacity: .42; cursor: default; }
           <div id="ov" class="ov">
             <div id="logo" class="logo"><div id="logo-t" class="logo-t">魔王の息子</div><div id="logo-s" class="logo-s">Son of the Demon King</div></div>
             <div id="foe" class="foe" hidden></div>
+            <div id="discov" class="discov" hidden></div>
             <div id="cutin" class="cutin" hidden></div>
             <div id="rolereveal" class="rolereveal" hidden></div>
             <div id="round" class="round" hidden></div>
@@ -11633,18 +11689,18 @@ var SFX = (function () {
   'use strict';
   var D = {
     title: ['魔王の息子', 'Son of the Demon King'],
-    tagline: ['4人で魔王に挑む協力RPG。ただし1人は裏切り者――「魔王の息子」。', 'A co-op RPG for four against the Demon King. But one of you is a traitor: the Son of the Demon King.'],
+    tagline: ['4人で魔王に挑む協力RPG。ただし1人は「魔王の息子」。', 'A co-op RPG for four against the Demon King. But one of you is the Son of the Demon King.'],
     name: ['なまえ', 'Name'],
     create: ['ルームを作る', 'Create a room'], create_solo: ['ひとりで始める（CPUと）', 'Play solo (with CPUs)'],
     net_claude: ['オンライン：{0}人が接続中', 'Online: {0} here'], net_local: ['ローカル接続（開発用）：{0}人', 'Local link (dev): {0} here'],
     net_solo: ['オフライン：この画面だけで遊べます', 'Offline: this screen only'], net_wait: ['接続を確認中…', 'Connecting…'],
     howto: ['あそびかた', 'How to play'],
     how1: ['4人がナイト・ファイター・アサシン・ウィザードを1つずつ担当します（空席はCPU）。', 'Four players take Knight, Fighter, Assassin and Wizard (empty seats are played by CPUs).'],
-    how2: ['1人だけ「魔王の息子」（裏切り者）がいます。正体は本人しか知りません。', 'Exactly one player is the Son of the Demon King, the traitor. Only they know.'],
+    how2: ['1人だけ「魔王の息子」がいます。正体は本人しか知りません。', 'Exactly one player is the Son of the Demon King. Only they know.'],
     how3: ['戦闘の前に毎回「議論ターン」。次の敵を見ながら、戦利品（レベルアップの石・宝箱のアイテム）を誰に渡すか話し合います（同じ人に3票で決定）。', 'Before every battle you negotiate: look at the next enemy and decide who gets the spoils (level-up stones, items from chests). 3 votes decide.'],
     how4: ['戦闘に勝つと全員レベルアップ。「スキル解放」か「ステータスUP（HP・攻撃）」を選びます。石を受け取った人はもう一度選べます。', 'Every win levels everyone up: unlock a skill or raise HP and ATK. A level-up stone gives one more choice.'],
     how5: ['雑魚→雑魚→中ボス→雑魚→魔王の順に戦います。全滅したら全員の負けです。', 'Fight mob, mob, mid-boss, mob, then the Demon King. If the party falls, everyone loses.'],
-    how6: ['魔王を倒すと裏切り者が覚醒し、最終戦「魔王の息子 対 残り3人」。勝った側の勝利です。', 'When the Demon King falls the traitor awakens: the Son against the other three. The winning side takes the game.'],
+    how6: ['魔王を倒すと魔王の息子が覚醒し、最終戦「魔王の息子 対 残り3人」。勝った側の勝利です。', 'When the Demon King falls the Son awakens: the Son against the other three. The winning side takes the game.'],
     lobby_title: ['ロビー', 'Lobby'], join: ['参加する', 'Join'], leave: ['抜ける', 'Leave'], picked: ['指定中', 'Chosen'],
     ult_key_a: ['', 'Effective ultimates: '], ult_key_and: [' と ', ' and '], ult_key_b: [' のウルトが有効（ダメージ2倍）', ' (double damage)'],
     type_key_fire: ['ファイアー技（全体攻撃）が有効：', 'Fire skills (hit all) work best: '], type_key_sword: ['ソード技（防御無視）が有効：', 'Sword skills (ignore armor) work best: '], type_key_b: ['', ''],
@@ -11687,7 +11743,7 @@ var SFX = (function () {
     in_progress: ['ゲーム進行中です（観戦できます）', 'A game is in progress (you can watch)'],
     invite: ['仲間はこのページを開いて同じルームに入ります（共有メニューからメールで招待）。', 'Friends join by opening this page (invite them by email from the Share menu).'],
 
-    role_title: ['あなたの正体', 'Your secret role'], role_v: ['平民（勇者パーティ）', 'Commoner (hero party)'], role_t: ['魔王の息子（裏切り者）', 'Son of the Demon King (traitor)'],
+    role_title: ['あなたの正体', 'Your secret role'], role_v: ['平民（勇者パーティ）', 'Commoner (hero party)'], role_t: ['魔王の息子', 'Son of the Demon King'],
     role_v_d: ['仲間と魔王を倒し、そのあと正体を現す「魔王の息子」を3人で討ち取れば勝利です。', 'Defeat the Demon King with your party, then beat the Son of the Demon King who reveals himself. The three of you win together.'],
     role_t_d: ['正体を隠したまま魔王を倒してください（全滅すればあなたも敗北）。その後に覚醒し、1人で3人と戦います。石や宝箱のアイテム、ランクストーンを自分に集めるほど最終戦で有利になります。', 'Stay hidden and help defeat the Demon King (if the party falls, you lose too). Then you awaken and fight the other three alone. The more stones, chest items and rank stones you collect, the stronger you are at the end.'],
     role_wait: ['正体を受け取っています…', 'Receiving your role…'], ok: ['OK', 'OK'], role_peek: ['正体を見る', 'Show my role'], role_hide: ['かくす', 'Hide'],
@@ -11700,7 +11756,7 @@ var SFX = (function () {
     weak_ult: ['有効なウルト：{0} ＋ {1}（ダメージ2倍）', 'Effective ultimates: {0} + {1} (double damage)'],
     weak_none: ['弱点なし。全員の火力で押し切れ', 'No weakness. Overwhelm it with everything you have'],
     en_count: ['{0}体', '{0} of them'], en_armor: ['防御 {0}%', 'Armor {0}%'], en_rage: ['ラウンドごとに攻撃が激化', 'Hits harder every round'],
-    en_final: ['裏切り者が覚醒した姿。HP大幅アップ、1ラウンドに2回行動。', 'The traitor, awakened. Far more HP and two actions per round.'],
+    en_final: ['魔王の息子が覚醒した姿。HP大幅アップ、1ラウンドに2回行動。', 'The Son, awakened. Far more HP and two actions per round.'],
     pool: ['共有ポイント', 'Shared points'], stones: ['ランクストーン', 'Rank stones'], deck: ['山札 残り{0}枚（うちストーン{1}）', 'Deck: {0} cards left ({1} stones)'],
     propose: ['配分を提案する', 'Propose a split'], propose_btn: ['この配分で提案', 'Propose this split'], props: ['提案', 'Proposals'], no_props: ['まだ提案はありません', 'No proposals yet'],
     by: ['{0}の案', '{0}\'s plan'], agree: ['賛成する', 'Agree'], agreed: ['賛成を取り消す', 'Withdraw my vote'], withdraw: ['取り下げる', 'Withdraw'], votes: ['賛成 {0}/3', 'Yes {0}/3'],
@@ -11730,7 +11786,7 @@ var SFX = (function () {
     mv_tent: ['テンタクル', 'Tentacle'], mv_ink: ['インク', 'Ink'], mv_wave: ['タイダルウェーブ', 'Tidal Wave'], mv_dark: ['ダークオーブ', 'Dark Orb'], mv_doom: ['ドゥーム', 'Doom'],
     mv_demon_king_wave: ['ダークウェーブ', 'Dark Wave'],
 
-    eff_ring: ['倒れても1回復活', 'Revives once'], eff_shield: ['毎R 最初の攻撃1回を無効', 'Blocks 1 attack per round'],
+    eff_ring: ['復活1回', 'Revive x1'], eff_shield: ['毎R 1回無効', '1 block/R'],
     no_skill: ['スキルなし', 'No skills yet'], cant_give: ['渡せません', 'Cannot take it'], picks_n: ['{0}票 / 3票で決定', '{0} of 3 votes'], picks_0: ['0票', '0 votes'], my_pick: ['あなたの票', 'Your vote'],
     loot_title2: ['戦利品：渡したい人をタップ（同じ人に3票で決定）', 'Spoils: tap who should get it (3 votes on the same person decide)'],
     disc_how: ['CPUは全員が投票した後（または8秒後）に一番人気の人へ票を合わせます。全部の戦利品が決まり、レベルアップも選び終わると自動で戦闘開始。もう一度タップで票を取り消せます。', 'Once every item is decided and every level-up chosen, the battle starts by itself. Tap again to take back your vote.'],
@@ -11747,7 +11803,7 @@ var SFX = (function () {
     card_stone: ['山札からランクストーンが出た！', 'The deck gave you a Rank Stone!'], card_none: ['山札をめくった… 何も出なかった', 'You drew from the deck… nothing this time'],
     lvup: ['レベルアップ！ 1つ選んでください', 'Level up! Choose one'], lv_hp: ['HP強化（+{0}）', 'More HP (+{0})'], lv_atk: ['攻撃強化（+{0}）', 'More ATK (+{0})'], lv_learn: ['{0} を習得', 'Learn {0}'], lv_done: ['選択しました', 'Chosen'],
 
-    reveal_1: ['魔王は倒れた。だが――', 'The Demon King has fallen. But—'], reveal_2: ['裏切り者は {0}（{1}）！', 'The traitor is {0} ({1})!'], reveal_3: ['「魔王の息子」が覚醒する…', 'The Son of the Demon King awakens…'],
+    reveal_1: ['魔王は倒れた。だが――', 'The Demon King has fallen. But—'], reveal_2: ['魔王の息子は {0}（{1}）！', 'The Son of the Demon King is {0} ({1})!'], reveal_3: ['「魔王の息子」が覚醒する…', 'The Son of the Demon King awakens…'],
     end_vil: ['平民チームの勝利！', 'The commoners win!'], end_son: ['魔王の息子の勝利', 'The Son of the Demon King wins'], end_none: ['全滅… 全員の敗北', 'The party was wiped out. Everyone loses.'],
     end_traitor: ['魔王の息子は {0}（{1}）でした', 'The Son of the Demon King was {0} ({1})'], again: ['ロビーに戻る', 'Back to the lobby'], you_win: ['あなたの勝ち！', 'You win!'], you_lose: ['あなたの負け…', 'You lose…'],
     wait_again: ['ホストがロビーに戻すのを待っています…', 'Waiting for the host to return to the lobby…'],
@@ -11758,16 +11814,16 @@ var SFX = (function () {
     lg_alloc: ['{0}の案が成立：{1}', '{0}\'s split passed: {1}'], lg_buy: ['{0}が {1} を解放', '{0} unlocked {1}'], lg_rank: ['{0}がジョブアップ：{1}', '{0} evolved: {1}'],
     lg_expire: ['時間切れ：{0}ポイントが失効', 'Time up: {0} points expired'],
     sound_on: ['音：ON', 'Sound: on'], sound_off: ['音：OFF', 'Sound: off'], lang: ['English', '日本語'],
-    net_mqtt: ['ルーム {0} ・ {1}人 ・ v3', 'Room {0} ・ {1} here ・ v3'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
+    net_mqtt: ['ルーム {0} ・ {1}人 ・ v4', 'Room {0} ・ {1} here ・ v4'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
     code_title: ['ルームコードで集まる', 'Meet by room code'], code_make: ['ルームを作る（コードを発行）', 'Create a room (get a code)'], code_or: ['または 友達のコードで参加', 'or join with a friend\'s code'],
     code_ph: ['ルームコード（6文字）', 'Room code (6 letters)'], code_join: ['参加', 'Join'], code_bad: ['コードは英数字6文字です', 'The code is 6 letters or digits'],
     code_finding: ['ルーム {0} を探しています…', 'Looking for room {0}…'], code_none: ['ルームが見つかりません。コードを確かめるか、ホストが先に作っているか確認してください。', 'No room found. Check the code, and that the host has created it first.'],
     code_copy: ['招待を コピー', 'Copy invite'], code_copied: ['コピーしました', 'Copied'], code_exit: ['ルームを出る', 'Leave room'],
     code_invite: ['【魔王の息子】ルームコード: {0}', '[Son of the Demon King] Room code: {0}'], code_share: ['このコードを友達に送ってください。友達はページを開いてコードを入力するだけで参加できます。', 'Send this code to your friends. They only need to open the page and type it.'],
-    rr_pre: ['あなたの正体は…', 'Your secret role is…'], rr_v: ['平民', 'COMMONER'], rr_t: ['裏切り者', 'TRAITOR'],
+    rr_pre: ['あなたの正体は…', 'Your secret role is…'], rr_v: ['平民', 'COMMONER'], rr_t: ['魔王の息子', 'DEMON KING\'S SON'],
     rr_v_sub: ['勇者パーティの仲間として、魔王を倒せ！', 'Fight beside your party and defeat the Demon King!'],
     rr_t_sub: ['正体を隠せ。魔王を倒したあと、「魔王の息子」として覚醒する', 'Stay hidden. After the Demon King falls, you awaken as his Son.'],
-    rr_secret: ['この画面は他の人に見せないで', 'Do not show this screen to anyone'], chip_v: ['あなた：平民', 'You: Commoner'], chip_t: ['あなた：裏切り者', 'You: Traitor'],
+    rr_secret: ['この画面は他の人に見せないで', 'Do not show this screen to anyone'], chip_v: ['あなた：平民', 'You: Commoner'], chip_t: ['あなた：魔王の息子', 'You: Demon King\'s Son'],
     inv_title: ['友達を招待する', 'Invite friends'], inv_code: ['ルームコード', 'Room code'], inv_copy: ['コードと案内をコピー', 'Copy code and message'],
     inv_code_how: ['友達に送ったコードを、友達が「コードで参加」に入力すると同じルームに入れます（同じファイルを開いてもらってください）。', 'Your friends open the same file, type this code under "Join" and they are in.'],
     inv_c1: ['① 画面右上の「共有」で、友達のメールアドレスを招待する（友達はClaudeにサインインが必要）', '1. Invite your friends by email with "Share" at the top right (they must sign in to Claude)'],
@@ -12747,7 +12803,7 @@ var SFX = (function () {
       if (en.fade !== undefined) { en.alpha = Math.max(0, 1 - (now - en.fade) / 550); if (en.alpha <= 0) { en.gone = true; delete en.fade; } }
       drawActor(en, now);
     }
-    for (i = 0; i < 4; i++) drawActor(heroes[i], now);
+    if (!SCN.hideHeroes) for (i = 0; i < 4; i++) drawActor(heroes[i], now);
     if (chest && S && S.ph === 'reward') drawChest(now); else chest = null;
     if (jstone !== null && S && S.ph === 'jobup') {
       var jb = Math.sin(now / 300) * 3, jt = Math.min(1, (now - jstone) / 600);
@@ -12762,7 +12818,7 @@ var SFX = (function () {
       for (i = 0; i < 5; i++) { var py2 = ep.foot - ((et / 4 + i * 30) % 110); fb.add(ep.x - 14 + i * 7, py2, '#e2c8ff', 0.9); fb.add(ep.x - 14 + i * 7, py2 + 1, '#e2c8ff', 0.5); }
     }
     // level over every head
-    if (S && S.pl) for (i = 0; i < 4; i++) {
+    if (S && S.pl && !SCN.hideHeroes) for (i = 0; i < 4; i++) {
       var la = unitActor(i);
       if (!la || la.gone || la.down || la.alpha < 0.5 || !S.pl[i]) continue;
       var lp = SCN.pos(i);
@@ -13174,7 +13230,7 @@ var SFX = (function () {
   }
   /** the next enemy, shown on the stage above the party during negotiation */
   function renderFoe() {
-    var S = cur(), el = $('foe'), show = !!S && S.ph === 'disc' && !!E.EN[S.enemy];
+    var S = cur(), el = $('foe'), show = false;
     if (!changed('foe', [show, show && S.enemy, show && S.stage, root.LANG, show && S.seats, me()])) return;
     el.hidden = !show;
     if (!show) { el.textContent = ''; return; }
@@ -13187,6 +13243,15 @@ var SFX = (function () {
       h('ul', {}, foeLines(S).map(function (l) { return h('li', { text: l }); })),
       h('div', { class: 'foe-mv', text: Object.keys(en.moves).map(function (m) { return moveName(S.enemy, m); }).join(' ・ ') })
     ])]);
+  }
+  /** the next enemy as a compact header of the vote overlay */
+  function foeHeader(S) {
+    var en = E.EN[S.enemy], art = SCN.thumb('enemy', en.art, 0, 1);
+    art.className = 'px foe-art'; art.style.width = ''; art.style.height = '';
+    return h('div', { class: 'dv-foe' }, [h('div', { class: 'foe-pic' }, art), h('div', { class: 'foe-info' }, [
+      h('div', { class: 'foe-name' }, [h('span', { class: 'foe-eye', text: T('next_enemy') + ' ・ ' + T('stage', S.stage + 1) + '　' }), N(en.n, true) + (en.count > 1 ? ' ×' + en.count : '')]),
+      foeKey(S),
+      h('div', { class: 'foe-mv', text: foeLines(S).concat([Object.keys(en.moves).map(function (m) { return moveName(S.enemy, m); }).join(' ・ ')]).join('　／　') })])]);
   }
   function voteDots(S, yes) { return h('span', { class: 'vdots' }, [0, 1, 2, 3].map(function (i) { return h('i', { class: (yes & (1 << i)) ? 'on' : '', title: seatName(S, i) }); })); }
   function bitsOf(m) { var c = 0; while (m) { c += m & 1; m >>= 1; } return c; }
@@ -13241,7 +13306,7 @@ var SFX = (function () {
       cells.push(h('div', { class: 'vt-who' + (j === k ? ' me' : '') }, [
         h('span', { class: 'c-top' }, [h('b', { class: 'c-nm', text: seatName(S, j) }), j === k ? h('span', { class: 'tag you', text: T('you') }) : null]),
         h('span', { class: 'c-job', text: jobName(S, j) + ' ' + T('lv', S.pl[j].lv) }),
-        h('span', { class: 'c-job', text: 'HP ' + hs.mhp + ' ・ ' + T('atk') + ' ' + hs.atk }),
+        h('span', { class: 'c-job' }, [h('span', { text: 'HP ' + hs.mhp }), h('span', { text: ' ' + T('atk') + ' ' + hs.atk })]),
         h('span', { class: 'c-sk' }, skillChips(S, j))]));
     });
     rows.forEach(function (r) {
@@ -13261,6 +13326,7 @@ var SFX = (function () {
   function panelDisc(S) {
     var d = S.disc, k = me(), seated = k >= 0, kids = [];
     kids.push(h('div', { class: 'head' }, [h('h2', { text: T('disc_title', S.stage + 1) }), h('span', { class: 'time' }, [T('time_left') + ' ', timer(d.end)])]));
+    kids.push(foeHeader(S));
     if (seated && S.pl[k].lvq > 0) kids.push(lvPicker(S, k));
     if (S.loot.length) {
       kids.push(h('div', { class: 'eyebrow', text: T('loot_title2') }));
@@ -13269,7 +13335,7 @@ var SFX = (function () {
           ok: function (j) { return E.canGive(S, L.id, j); }, eff: function (j) { return lootEffect(S, L.k, j); }, pick: function (j) { ROOM.send({ t: 'pick', li: L.id, to: j }); } };
       })));
     } else kids.push(h('p', { class: 'dim', text: T('no_loot') }));
-    kids.push(h('p', { class: 'dim', text: d.fin ? T('disc_fin') : seated ? T('disc_how') : T('spectate') }));
+    kids.push(h('p', { class: 'dim dv-help', text: d.fin ? T('disc_fin') : seated ? T('disc_how') : T('spectate') }));
     return [h('div', { class: 'box fill' }, kids)];
   }
   function panelJobup(S) {
@@ -13359,7 +13425,7 @@ var SFX = (function () {
     return [h('div', { class: 'box center' }, kids)];
   }
   function renderPanel() {
-    var v = ROOM.view, S = v && v.S, el = $('panel'), kids, key;
+    var v = ROOM.view, S = v && v.S, el = $('panel'), kids, key, target = el;
     if (ROOM.hostGone) {
       if (!changed('panel', ['gone', root.LANG])) return;
       swap(el, [h('div', { class: 'box center' }, [h('p', { class: 'lead', text: T('host_gone') }), btn('b-new', T('new_room'), function () { if (NET.mode === 'mqtt') leaveRoomNow(); else ROOM.forget(); })])]);
@@ -13369,7 +13435,7 @@ var SFX = (function () {
     else if (!v) { key = ['title', NET.mode, root.LANG]; if (!changed('panel', key)) return; kids = panelTitle(); }
     else if (!S) { key = ['lobby', v.L, ROOM.isHost, ROOM.joined, ROOM.hostPeer, root.LANG, NET.mode]; if (!changed('panel', key)) return; kids = panelLobby(v); }
     else if (S.ph === 'intro') { key = ['intro', S.ok, ROOM.role, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelIntro(S); }
-    else if (S.ph === 'disc') { key = ['disc', S.disc, S.loot, S.pl, S.seats, me(), root.LANG, S.stage]; if (!changed('panel', key)) return; kids = panelDisc(S); }
+    else if (S.ph === 'disc') { key = ['disc', S.disc, S.loot, S.pl, S.seats, me(), root.LANG, S.stage]; if (!changed('panel', key)) return; kids = panelDisc(S); target = $('discov'); }
     else if (S.ph === 'battle' || S.ph === 'final') {
       var b = S.bat, k = me();
       var tk = b.rnd * 100 + b.ti;
@@ -13378,12 +13444,13 @@ var SFX = (function () {
       if (!changed('panel', key)) return;
       kids = panelBattle(S);
     } else if (S.ph === 'reward') { key = ['rw', S.rw, S.pl, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelReward(S); }
-    else if (S.ph === 'jobup') { key = ['ju', S.ju, S.pl, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelJobup(S); }
+    else if (S.ph === 'jobup') { key = ['ju', S.ju, S.pl, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelJobup(S); target = $('discov'); }
     else if (S.ph === 'evolve') { key = ['evo', S.evo, root.LANG]; if (!changed('panel', key)) return; kids = [h('div', { class: 'box fill center' }, [h('p', { class: 'lead', text: T('evo_wait', seatName(S, S.evo.to)) })])]; }
     else if (S.ph === 'cutin') { key = ['ci', S.stage, root.LANG]; if (!changed('panel', key)) return; kids = [h('div', { class: 'box fill center' }, [h('p', { class: 'dim', text: T('cut_next') })])]; }
     else if (S.ph === 'reveal') { key = ['rv', S.son, root.LANG]; if (!changed('panel', key)) return; kids = panelReveal(S); }
     else { key = ['end', S.res, ROOM.isHost, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelEnd(S); }
-    swap(el, kids);
+    if (target !== el) swap(el, []);
+    swap(target, kids);
     renderHot();
     fitLayout();
   }
@@ -13455,6 +13522,18 @@ var SFX = (function () {
   };
   SCN.onChange = function () { renderParty(); renderPlates(); };
   SCN.sfx = function (name) { SFX.play(name); };
+  /** while the spoils / job-up stone are decided the characters step out of the picture and the vote screen covers the whole stage */
+  function renderMode() {
+    var S = cur(), on = !!S && (S.ph === 'disc' || S.ph === 'jobup'), ov = $('discov');
+    SCN.hideHeroes = on;
+    if (!changed('mode', [on, S && S.ph])) return;
+    doc.querySelector('.main').classList.toggle('vote-mode', on);
+    ov.hidden = !on;
+    if (!on) ov.textContent = '';
+    $('party').hidden = on || !S;
+    sigs.party = '';
+    fitLayout(); alignParty();
+  }
   function renderStage() {
     var v = ROOM.view, S = v && v.S, ph = S ? S.ph : v ? 'lobby' : 'title';
     if (!changed('stage', [ph, root.LANG, S && S.stage, S && S.son, S && S.evo && S.evo.to])) return;
@@ -13517,7 +13596,7 @@ var SFX = (function () {
     var v = ROOM.view, S = v && v.S;
     SCN.apply(S || null);
     if (v && !S && !ROOM.joined && !ui.left && !ROOM.hostGone && ((v.L.players || []).length < 4)) { if (!NET.me.name) ROOM.rename('Player'); ROOM.send({ t: 'join' }); }
-    renderTop(); renderStage(); renderCutin(); renderRoleReveal(); renderFoe(); renderParty(); renderPanel(); renderPlates(); renderHot(); renderSide(); music();
+    renderTop(); renderStage(); renderCutin(); renderRoleReveal(); renderFoe(); renderMode(); renderParty(); renderPanel(); renderPlates(); renderHot(); renderSide(); music();
   }
   UI.render = render;
 
