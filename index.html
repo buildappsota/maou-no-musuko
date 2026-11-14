@@ -11425,12 +11425,13 @@ var SFX = (function () {
     if (sk.ult && !act.release) {
       // an ultimate is charged first: it goes off by itself on this hero's next turn, and everybody can see it coming
       h.st.chg = { s: sk.id, t: sk.tg === 'foe' ? tg[0] : -1 };
-      ev(b, { k: 'chg', a: k, s: sk.id, t: h.st.chg.t });
+      ev(b, { k: 'chg', a: k, s: sk.id, t: h.st.chg.t, auto: act.auto ? 1 : undefined });
       b.wait = now + 1100; b.end = 0; b.think = 0; b.cur = -1; b.ti++;
       return true;
     }
     if (act.release) delete h.st.chg;
     e = { k: 'act', a: k, s: sk.id, tg: tg.slice(), r: [] };
+    if (act.auto) e.auto = 1;
     if (b.kind === 'pve' && E.isEffective(S, sk.id)) e.w = 1;
     if (b.g >= 0 && S.seats[k].job === 0 && side(b, k) === 'h') e.g = b.g;
     if (sk.ult) h.cd[sk.id] = P.ultCd + 1;
@@ -11703,7 +11704,8 @@ var SFX = (function () {
   /** the AI acts for seat k; if that somehow fails, fall back to a basic attack, then to passing the turn. */
   function autoAct(S, X, k, now, rng) {
     var b = S.bat;
-    if (heroAct(S, X, k, E.aiAct(S, k, rng), now, rng)) return;
+    var ai = E.aiAct(S, k, rng); if (!isBot(S, k)) ai.auto = 1;     // a person who ran out of time: everyone is told the CPU played for them
+    if (heroAct(S, X, k, ai, now, rng)) return;
     var fs = foes(b, k);
     if (fs.length && heroAct(S, X, k, { s: JS[S.seats[k].job].basic, t: fs[0], g: -1 }, now, rng)) return;
     b.ti++;
@@ -11949,6 +11951,8 @@ var SFX = (function () {
     chg_banner: ['{0}が{1}の力をためている！', '{0} is charging {1}!'], chg_at: ['（狙い：{0}）', ' (aimed at {0})'],
     reconn: ['接続が切れています', 'You are disconnected'], reconn_b: ['再接続する', 'Reconnect'], reconn_d: ['押すとページを読み込み直し、同じ席に戻ります', 'Reloads the page and puts you back in your seat'],
     ct_d: ['与ダメ ', 'DMG '], ct_h: ['回復 ', 'Heal '], ct_c: ['かばう ', 'Cover '],
+    host_note: ['あなたがホストです。画面を閉じると全員のゲームが止まります（同じ端末で招待リンクを開き直せば続きから再開）。', 'You are the host: if you close this page the game pauses for everyone (open the invite link again on this device to resume).'],
+    auto_tag: ['（時間切れでCPUが代行）', '(time ran out: CPU played)'],
     last_hit: ['とどめ', 'Final blow'], prev: ['前戦', 'Last fight'], prev_title: ['前の戦闘で与えたダメージ・回復・かばって受けたダメージ', 'Last battle: damage dealt, healing, damage taken while covering'],
     near_none: ['魔王軍の残りHPはあと{0}%だった…！', 'The enemy had only {0}% HP left…!'], near_son: ['魔王の息子の残りHP {0}%', 'The Son had {0}% HP left'], near_vil: ['平民チームの残りHP {0}%', 'The party had {0}% HP left'],
     son_share_a: ['{0}が道中で与えたダメージは全体の ', '{0} dealt '], son_share_b: ['（4人なら平均25%）', ' of the party\'s damage on the way (fair share: 25%)'],
@@ -11971,7 +11975,7 @@ var SFX = (function () {
     lg_alloc: ['{0}の案が成立：{1}', '{0}\'s split passed: {1}'], lg_buy: ['{0}が {1} を解放', '{0} unlocked {1}'], lg_rank: ['{0}がジョブアップ：{1}', '{0} evolved: {1}'],
     lg_expire: ['時間切れ：{0}ポイントが失効', 'Time up: {0} points expired'],
     sound_on: ['音：ON', 'Sound: on'], sound_off: ['音：OFF', 'Sound: off'], lang: ['English', '日本語'],
-    net_mqtt: ['ルーム {0} ・ {1}人 ・ v8', 'Room {0} ・ {1} here ・ v8'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
+    net_mqtt: ['ルーム {0} ・ {1}人 ・ v9', 'Room {0} ・ {1} here ・ v9'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
     code_title: ['ルームコードで集まる', 'Meet by room code'], code_make: ['ルームを作る（コードを発行）', 'Create a room (get a code)'], code_or: ['または 友達のコードで参加', 'or join with a friend\'s code'],
     code_ph: ['ルームコード（6文字）', 'Room code (6 letters)'], code_join: ['参加', 'Join'], code_bad: ['コードは英数字6文字です', 'The code is 6 letters or digits'],
     code_finding: ['ルーム {0} を探しています…', 'Looking for room {0}…'], code_none: ['ルームが見つかりません。コードを確かめるか、ホストが先に作っているか確認してください。', 'No room found. Check the code, and that the host has created it first.'],
@@ -12171,6 +12175,7 @@ var SFX = (function () {
     Object.keys(mqTable).forEach(function (id) { if (now - mqTable[id].at > 20000) delete mqTable[id]; else list.push({ peer: id, p: mqTable[id].p }); });
     others = list; fire();
   }
+  function keepSeat(code) { if (code) store('l', 'mm_seat_' + code, JSON.stringify({ id: NET.me.id, at: Date.now() })); }
   /** join (or create) the room with this code. */
   NET.connectRoom = function (code) {
     code = String(code || '').toUpperCase();
@@ -12178,6 +12183,29 @@ var SFX = (function () {
     NET.leaveRoom(true);
     NET.room = code; NET.mode = 'mqtt'; NET.err = null; NET.joinedAt = Date.now();
     store('s', 'mm_code', code);
+    // a tab that was closed and opened again gets its old seat back: the player id of this room is kept on the device
+    // (only when no other tab of this device is using it right now, and only the first time this tab enters the room)
+    if (!store('s', 'mm_in_' + code)) {
+      var sv = null; try { sv = JSON.parse(store('l', 'mm_seat_' + code) || 'null'); } catch (e) { sv = null; }
+      var age = sv ? Date.now() - (sv.at || 0) : 0;
+      if (sv && sv.id && sv.id !== NET.me.id && age > 3500 && age < 12 * 3600 * 1000) {
+        NET.me.id = sv.id; store('s', 'mm_pid', sv.id); if (mine.id) mine.id = sv.id;
+      } else if (sv && sv.id && sv.id !== NET.me.id && age <= 3500) {
+        // reopened very quickly: the old tab may still look alive. Look again shortly; if this page has no seat by then, take the old id
+        var oldId = sv.id;
+        root.setTimeout(function () {
+          var cur = null; try { cur = JSON.parse(store('l', 'mm_seat_' + code) || 'null'); } catch (e) { cur = null; }
+          var stillAlive = cur && cur.id === oldId && Date.now() - (cur.at || 0) < 3500;
+          if (NET.room === code && !stillAlive && root.ROOM && root.ROOM.mySeat < 0) {
+            NET.me.id = oldId; store('s', 'mm_pid', oldId); if (mine.id) mine.id = oldId;
+            NET.connectRoom(code);
+          }
+        }, 4500);
+      }
+      store('s', 'mm_in_' + code, '1');
+    }
+    keepSeat(code);
+    try { if (root.history && root.history.replaceState && root.location.hash.replace('#', '').toUpperCase() !== code) root.history.replaceState(null, '', '#' + code); } catch (e) { /* not allowed here */ }
     var tok = ++mqTok;
     mqDerive(code).then(function (d) {
       if (tok !== mqTok) return;                       // left or switched rooms meanwhile
@@ -12197,7 +12225,7 @@ var SFX = (function () {
         }
       });
       mq.subscribe(mqTopic('+'));
-      mqBeat = root.setInterval(function () { mqPublish(); }, 2000);
+      mqBeat = root.setInterval(function () { mqPublish(); keepSeat(NET.room); }, 2000);
       mqSweep = root.setInterval(mqRebuild, 1500);
       fire();
     }, function () { if (tok === mqTok) { NET.err = 'crypto'; fire(); } });
@@ -12211,7 +12239,7 @@ var SFX = (function () {
     mqKey = null; mqHid = '';
     if (mqBeat) root.clearInterval(mqBeat); if (mqSweep) root.clearInterval(mqSweep);
     mqBeat = mqSweep = null; mqTable = {}; others = []; NET.online = false;
-    if (!keep) { NET.room = ''; store('s', 'mm_code', null); fire(); }
+    if (!keep) { if (NET.room) store('l', 'mm_seat_' + NET.room, null); NET.room = ''; store('s', 'mm_code', null); try { if (root.history && root.history.replaceState) root.history.replaceState(null, '', root.location.pathname + root.location.search); } catch (e) { /* ignore */ } fire(); }
   };
   if (root.document && root.document.addEventListener) root.document.addEventListener('visibilitychange', function () { if (!root.document.hidden && mq) mqPublish(); });   // back from another app: announce ourselves at once
   NET.setName = function (nm) { NET.me.name = String(nm || '').slice(0, 12); store('l', 'mm_name', NET.me.name); store('s', 'mm_name', NET.me.name); };
@@ -12439,7 +12467,12 @@ var SFX = (function () {
       // the room refused this shape or size: fall back to one flat string and lighter content
       if (e && (e.code === 'invalid_argument' || e.code === 'too_big') && !H.str) { H.str = true; H.dirty = true; }
     });
-    if (now - (H.saved || 0) > 1500) { H.saved = now; NET.store('s', 'mm_host2', JSON.stringify({ born: H.born, L: H.L, S: H.S, X: H.X, acks: H.acks, at: now })); }
+    if (now - (H.saved || 0) > 1500) {
+      H.saved = now;
+      var snap = JSON.stringify({ born: H.born, L: H.L, S: H.S, X: H.X, acks: H.acks, at: now, pid: NET.me.id, room: NET.room || '' });
+      NET.store('s', 'mm_host2', snap);
+      if (NET.room) NET.store('l', 'mm_host_' + NET.room, snap);     // survives closing the tab: opening the room link again on this device resumes it
+    }
   }
   // The host's game loop must keep running while its tab is in the background, where page timers are throttled.
   // A worker's timer is not, so the ticks come from a tiny worker when the browser allows one.
@@ -12472,7 +12505,7 @@ var SFX = (function () {
   function stopHosting() {
     if (timer) timer.stop();
     timer = null; H = null; ROOM.isHost = false;
-    NET.store('s', 'mm_host2', null);
+    NET.store('s', 'mm_host2', null); if (NET.room) NET.store('l', 'mm_host_' + NET.room, null);
     NET.set({ h: null, v: null, now: null, born: null, ak: null, hk: null, rb: null, L: null, S: null, st: null }).then(null, function () {});
     ROOM.view = null; ROOM.mySeat = -1; ROOM.role = null;
     scan();
@@ -12524,7 +12557,7 @@ var SFX = (function () {
     }
     if (ROOM.isHost) return;
     if (best) {
-      if (resume && best.born !== resume.born) { resume = null; NET.store('s', 'mm_host2', null); }
+      if (resume && best.born !== resume.born) { resume = null; NET.store('s', 'mm_host2', null); if (NET.room) NET.store('l', 'mm_host_' + NET.room, null); }
       if (!ROOM.view || best.v !== ROOM.view.v || best.born !== ROOM.view.born) setView(best, bestId);
       else { lastView = Date.now(); if (ROOM.hostGone) { ROOM.hostGone = false; fire(); } }
     } else if (ROOM.view && !ROOM.hostGone && Date.now() - lastView > 5000) { ROOM.hostGone = true; fire(); }
@@ -12575,7 +12608,9 @@ var SFX = (function () {
       root.setInterval(scan, 1000);
       // a host that reloaded picks its room up again, unless someone else is hosting by then
       try { resume = JSON.parse(NET.store('s', 'mm_host2') || 'null'); } catch (e) { resume = null; }
+      if (!resume && NET.room) { try { resume = JSON.parse(NET.store('l', 'mm_host_' + NET.room) || 'null'); } catch (e2) { resume = null; } if (resume && resume.pid !== NET.me.id) resume = null; }
       if (resume && Date.now() - resume.at > 6 * 3600 * 1000) resume = null;
+      if (resume && (resume.room || '') !== (NET.room || '')) resume = null;      // only the room this page is in
       if (resume) {
         root.setTimeout(function () {
           if (resume && !ROOM.isHost && !ROOM.view) startHosting(resume);
@@ -12846,7 +12881,7 @@ var SFX = (function () {
     } else if (e.k === 'act') {
       var sk = E.SK[e.s];
       a = unitActor(e.a); src = SCN.pos(e.a);
-      if (SCN.onBanner) SCN.onBanner({ k: 'act', a: e.a, s: e.s, w: e.w });
+      if (SCN.onBanner) SCN.onBanner({ k: 'act', a: e.a, s: e.s, w: e.w, auto: e.auto });
       var pose = (sk.slot === 'basic' || (sk.pow && sk.job !== 3)) ? 'attack' : 'cast';
       var fdur = (FX.defs[e.s] || FX.defs.hit).dur;
       if (a && a.def.poses.cast === undefined && pose === 'cast') pose = 'attack';
@@ -12864,7 +12899,7 @@ var SFX = (function () {
       dur = 200 + castFx(mv.fx, e, src, now, now + 200) + 300;
     } else if (e.k === 'chg') {
       a = unitActor(e.a); src = SCN.pos(e.a);
-      if (SCN.onBanner) SCN.onBanner({ k: 'chg', a: e.a, s: e.s, t: e.t });
+      if (SCN.onBanner) SCN.onBanner({ k: 'chg', a: e.a, s: e.s, t: e.t, auto: e.auto });
       if (a) { a.st.chg = 1; a.flash = 0.7; setPose(a, a.def.poses.cast === undefined ? 'attack' : 'cast', 700, now); }
       popup(src, 'CHARGE', '#ffb43a', true);
       FX.spawn('rankup', { x: src.x, y: src.y, sx: src.x, sy: src.y, seed: e.n * 7 }, now);
@@ -13094,6 +13129,13 @@ var SFX = (function () {
   }
   function cur() { return ROOM.view && ROOM.view.S; }
   function me() { return ROOM.mySeat; }
+  /** a name for someone who did not type one: a short hero name nobody in the room uses yet */
+  function autoName() {
+    var used = {}, v = ROOM.view, list = root.LANG === 'en' ? ['Allen', 'Mina', 'Guy', 'Rio', 'Sena', 'Kai', 'Noah', 'Yuna', 'Ren', 'Hal'] : ['アレン', 'ミナ', 'ガイ', 'リオ', 'セナ', 'カイ', 'ノア', 'ユナ', 'レン', 'ハル'];
+    ((v && v.L && v.L.players) || []).forEach(function (p) { used[p.nm] = 1; });
+    var free = list.filter(function (n) { return !used[n]; });
+    return (free.length ? free : list)[Math.floor(Math.random() * (free.length || list.length))];
+  }
   function seatName(S, i) { var s = S.seats[i]; return s.nm || (T('cpu') + ' ' + N(E.JOBS[s.job].n)); }
   function jobName(S, i) { var j = E.JOBS[S.seats[i].job]; return N(S.pl[i].rank ? j.rn : j.n); }
   function unitName(S, ref) {
@@ -13131,6 +13173,7 @@ var SFX = (function () {
     $('b-home').hidden = !homeOn;
     $('b-home').textContent = T(ui.homeArm ? 'home_confirm' : 'home');
     $('b-full').textContent = T(full ? 'full_exit' : 'full');
+    $('b-full').hidden = !(doc.documentElement.requestFullscreen || doc.documentElement.webkitRequestFullscreen) || doc.fullscreenEnabled === false;
     $('b-diag').textContent = T('diag');
     $('net').textContent = net;
     $('net').className = 'net ' + (NET.mode === 'solo' ? 'off' : 'on');
@@ -13196,7 +13239,6 @@ var SFX = (function () {
         return h('span', { class: 'dot' + (on ? ' on' : '') + (d[0] === 'ult' ? ' ult' : ''), title: T('slot_' + d[0]) + ': ' + skillName(id), text: d[1] });
       });
       dots.push(h('span', { class: 'dot rk' + (p.rank ? ' on' : ''), title: T('slot_rank'), text: 'RK' }));
-      kids.push(h('div', { class: 'dots' }, dots));
       var marks = Object.keys(p.it || {}).map(function (it) { var c = icon(it, 16); c.title = lootName(it) + (p.it[it] === 2 ? ' ✕' : ''); if (p.it[it] === 2) c.style.opacity = '.35'; return c; });
       if (p.lvq > 0) marks.push(h('span', { class: 'chip lvq', text: T('lv_up_chip') }));
       if (S.ph === 'intro' && (S.ok & (1 << i))) marks.push(h('span', { class: 'chip ok', text: T('ok') }));
@@ -13267,7 +13309,7 @@ var SFX = (function () {
     function joinNow() {
       var c = (ui.joinCode || '').toUpperCase();
       if (!NET.validCode(c)) { showBanner(T('code_bad'), 2200, 'warn'); return; }
-      if (!NET.me.name) ROOM.rename('Player');
+      if (!NET.me.name) ROOM.rename(autoName());
       ui.joinCode = ''; NET.connectRoom(c); render();
     }
     return [h('div', { class: 'box fill center' }, [
@@ -13275,7 +13317,7 @@ var SFX = (function () {
       h('p', { class: 'dim', text: T('code_steps') }),
       h('label', { class: 'field', for: 'nm' }, [h('span', { text: T('name') }), nm]),
       btn('b-create', T('code_make'), function () {
-        if (!NET.me.name) ROOM.rename('Player');
+        if (!NET.me.name) ROOM.rename(autoName());
         NET.connectRoom(NET.newCode()); ROOM.create(); ROOM.send({ t: 'join' }); render();
       }, { cls: 'primary big' }),
       h('div', { class: 'dim', text: T('code_or') }),
@@ -13295,7 +13337,7 @@ var SFX = (function () {
     return [h('div', { class: 'box fill center' }, [
       h('p', { class: 'lead', text: T('tagline') }),
       h('label', { class: 'field', for: 'nm' }, [h('span', { text: T('name') }), nm]),
-      btn('b-create', T(NET.mode === 'solo' ? 'create_solo' : 'create'), function () { if (!NET.me.name) ROOM.rename('Player'); ROOM.create(); ROOM.send({ t: 'join' }); }, { cls: 'primary big' }),
+      btn('b-create', T(NET.mode === 'solo' ? 'create_solo' : 'create'), function () { if (!NET.me.name) ROOM.rename(autoName()); ROOM.create(); ROOM.send({ t: 'join' }); }, { cls: 'primary big' }),
       NET.mode === 'claude' ? inviteCard() : null,
       h('details', { class: 'how' }, [h('summary', { text: T('howto') }), h('ol', {}, ['how1', 'how2', 'how3', 'how4', 'how5', 'how6'].map(function (k) { return h('li', { text: T(k) }); }))])
     ])];
@@ -13349,12 +13391,13 @@ var SFX = (function () {
       h('div', { class: 'head' }, [h('h2', { text: T('lobby_title') }), joined
         ? btn('b-leave', T('leave'), function () { ui.left = true; ROOM.send({ t: 'leave' }); }, { cls: 'sm' })
         : (L.cfg.lock && !host ? h('span', { class: 'chip', text: T('room_locked') })
-          : btn('b-join', T('join'), function () { ui.left = false; if (!NET.me.name) ROOM.rename('Player'); ROOM.send({ t: 'join' }); }, { cls: 'primary sm' }))]),
+          : btn('b-join', T('join'), function () { ui.left = false; if (!NET.me.name) ROOM.rename(autoName()); ROOM.send({ t: 'join' }); }, { cls: 'primary sm' }))]),
       h('div', { class: 'slots' }, slots),
       h('p', { class: 'dim', text: solo ? T('solo_pick') : T('lobby_random') }),
       h('div', { class: 'jobs' }, cards),
       h('div', { class: 'row wrap' }, [h('label', { class: 'field', for: 'nm' }, [h('span', { text: T('name') }), nm]), cfg]),
       h('div', { class: 'grow' }),
+      host && NET.mode === 'mqtt' ? h('p', { class: 'dim', text: T('host_note') }) : null,
       host ? h('div', { class: 'row' }, [btn('b-start', T('start'), function () { ROOM.send({ t: 'start' }); }, { cls: 'primary big grow', disabled: !pls.length, title: pls.length ? null : T('need_seat') }),
         btn('b-close', T('close_room'), function () { ROOM.close(); })]) : h('p', { class: 'dim', text: joined ? T('wait_host') : (c.lock ? T('room_locked') : T('need_seat')) })
     ])];
@@ -13633,7 +13676,7 @@ var SFX = (function () {
     else if (S.ph === 'battle' || S.ph === 'final') {
       var b = S.bat, k = me();
       var tk = b.rnd * 100 + b.ti;
-      if (ui.turnKey !== S.stage + ':' + tk) { ui.turnKey = S.stage + ':' + tk; ui.skill = null; ui.target = -1; ui.guard = b.g; if (b.cs === k && k >= 0) SFX.play('turn'); }
+      if (ui.turnKey !== S.stage + ':' + tk) { ui.turnKey = S.stage + ':' + tk; ui.skill = null; ui.target = -1; ui.guard = b.g; if (b.cs === k && k >= 0) { SFX.play('turn'); try { if (root.navigator.vibrate) root.navigator.vibrate([60, 40, 60]); } catch (e) { /* not allowed */ } } }
       key = ['bat', b.cs, b.over, b.rnd, b.ti, b.end, SCN.busy(), ui.skill, ui.target, ui.guard, ui.sent, sentHere(S), k, root.LANG, b.cs === k ? [SCN.hp, b.hs[k].cd] : 0];
       if (!changed('panel', key)) return;
       kids = panelBattle(S);
@@ -13706,7 +13749,7 @@ var SFX = (function () {
     if (!S || !S.bat) return;
     if (o.k === 'start') txt = S.bat.kind === 'final' ? T('appear_final', seatName(S, S.bat.son)) : T('appear', N(E.EN[S.enemy].n));
     else if (o.k === 'round') { $('round').textContent = T('round', o.r); return; }
-    else if (o.k === 'act') txt = T('uses', unitName(S, o.a), skillName(o.s)) + (o.w ? ' ' + T('weak_hit') : '');
+    else if (o.k === 'act') txt = T('uses', unitName(S, o.a), skillName(o.s)) + (o.w ? ' ' + T('weak_hit') : '') + (o.auto ? ' ' + T('auto_tag') : '');
     else if (o.k === 'en') txt = T('uses', unitName(S, o.a), moveName(S.enemy, o.m));
     else if (o.k === 'chg') txt = T('chg_banner', unitName(S, o.a), skillName(o.s)) + (o.t >= 0 ? T('chg_at', unitName(S, o.t)) : '');
     else if (o.k === 'tele') txt = o.t >= 0 ? T('tele_one', unitName(S, o.a), seatName(S, o.t)) : T('tele_all', unitName(S, o.a));
@@ -13789,7 +13832,7 @@ var SFX = (function () {
   function render() {
     var v = ROOM.view, S = v && v.S;
     SCN.apply(S || null);
-    if (v && !S && !ROOM.joined && !ui.left && !ROOM.hostGone && ((v.L.players || []).length < 4)) { if (!NET.me.name) ROOM.rename('Player'); ROOM.send({ t: 'join' }); }
+    if (v && !S && !ROOM.joined && !ui.left && !ROOM.hostGone && ((v.L.players || []).length < 4)) { if (!NET.me.name) ROOM.rename(autoName()); ROOM.send({ t: 'join' }); }
     renderTop(); renderStage(); renderCutin(); renderRoleReveal(); renderFoe(); renderMode(); renderParty(); renderPanel(); renderPlates(); renderHot(); renderSide(); music();
   }
   UI.render = render;
