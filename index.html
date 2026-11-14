@@ -10675,7 +10675,7 @@ var SFX = (function () {
     chill: 0.5, counterPow: 0.8, atkDown: 0.75, atkDownRounds: 2, weakUlt: 2.0,
     // the traitor's "awakening" in the final battle: HP = hpBase + hpMul x own HP, ATK x atk[job], acts per round, AoE damage factor
     son: { hpBase: 720, hpMul: 2, atk: [1.56, 1.97, 1.9, 2.1], rankAtk: 1.06, acts: 2, aoe: 0.55, ward: 0.55, rage: 0.06, cap: 30 },   // cap: the final ends after this many rounds (higher remaining HP share wins). rage: the Son hits harder every round, so the fight always ends
-    discSec: 90, turnSec: 45, lvSec: 30, introSec: 25, cutSec: 5, juSec: 60, evoSec: 6
+    discSec: 90, turnSec: 10, lvSec: 10, introSec: 25, cutSec: 5, juSec: 60, evoSec: 6
   };
 
   /* ------------------------------------------------------------------ data */
@@ -12032,7 +12032,7 @@ var SFX = (function () {
       else if (mine && inp.t === 'kick') { if (inp.pid !== pid) { L.ban = (L.ban || []).concat([inp.pid]).slice(-20); } L.players =L.players.filter(function (p) { return p.pid !== inp.pid || p.pid === pid; }); }
       else if (mine && inp.t === 'cfg') {
         if ([0, 60, 90, 120, 180, 300].indexOf(inp.dsec) >= 0) L.cfg.dsec = inp.dsec;
-        if ([0, 30, 45, 60, 90].indexOf(inp.tsec) >= 0) L.cfg.tsec = inp.tsec;
+        if ([0, 10, 20, 30, 45, 60, 90].indexOf(inp.tsec) >= 0) L.cfg.tsec = inp.tsec;
         if (inp.expire !== undefined) L.cfg.expire = !!inp.expire;
         if (inp.lock !== undefined) L.cfg.lock = !!inp.lock;
       } else if (mine && inp.t === 'start') {
@@ -12988,7 +12988,7 @@ var SFX = (function () {
     });
     var c = L.cfg, cfg = host ? h('div', { class: 'cfg' }, [
       select('c-dsec', T('cfg_disc'), [60, 90, 120, 180, 300, 0], c.dsec, function (x) { ROOM.send({ t: 'cfg', dsec: x }); }),
-      select('c-tsec', T('cfg_turn'), [30, 45, 60, 90, 0], c.tsec, function (x) { ROOM.send({ t: 'cfg', tsec: x }); }),
+      select('c-tsec', T('cfg_turn'), [10, 20, 30, 45, 60, 0], c.tsec, function (x) { ROOM.send({ t: 'cfg', tsec: x }); }),
       btn('b-lock', c.lock ? T('lock_on') : T('lock_off'), function () { SFX.play('ui_move'); ROOM.send({ t: 'cfg', lock: !c.lock }); }, { cls: 'sm' + (c.lock ? ' primary' : ''), title: T('lock_tip') })
     ]) : h('p', { class: 'dim', text: cfgText(c) });
     var nm = h('input', { id: 'nm', type: 'text', maxlength: '12', value: NET.me.name, autocomplete: 'off', oninput: function () { ROOM.rename(this.value); } });
