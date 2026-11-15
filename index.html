@@ -46,23 +46,23 @@ ul, ol { margin: 0; padding-left: 1.2em; }
 .net.on::before { background: var(--green); }
 .tbtn { font: inherit; font-size: 12px; color: var(--ink); background: transparent; border: 1px solid var(--line); padding: 2px 8px; cursor: pointer; white-space: nowrap; }
 .tbtn:hover { border-color: var(--gold); }
-.main { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.main { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 6px; position: relative; container-type: size; }
 .left { flex: none; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .stage-wrap { display: flex; justify-content: center; }
-.stage { position: relative; aspect-ratio: 384 / 216; width: min(100%, calc((100dvh - 410px) * 1.7778)); min-width: 260px; max-width: 100%;
+.stage { position: relative; aspect-ratio: 384 / 216; width: min(100%, calc((100dvh - 410px) * 1.7778)); min-width: 240px; max-width: 100%; flex: none;
   background: #0a0810; border: 2px solid var(--line); overflow: hidden; container-type: inline-size; }
 .panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: auto; }
-/* wide screens and fullscreen: the stage on top, the party plates right under the characters, the command window below */
+/* wide screens and fullscreen: see the block below */
 @media (min-aspect-ratio: 5/4) and (min-width: 760px) {
-  .main { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto auto; grid-template-areas: "stage" "party" "panel"; }
+  /* wide screens: stage with the party plates under it on the left, the command window on the right (full height) */
+  .main { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "stage panel" "party panel"; align-items: start; column-gap: 8px; }
   .left { display: contents; }
-  .stage-wrap { grid-area: stage; min-height: 0; container-type: size; align-items: center; }
-  .stage { width: min(100cqw, 100cqh * 1.7778); min-width: 0; }
-  .main .party { grid-area: party; }
-  .main .panel { grid-area: panel; max-height: 62vh; }
+  .stage-wrap { grid-area: stage; min-height: 0; }
+  .main .party { grid-area: party; align-self: start; }
+  .main .panel { grid-area: panel; align-self: stretch; min-height: 0; }
   .main .panel > .box.fill { flex: 0 0 auto; }
-  .main .skills { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .main .jobs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .main .skills { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .main .jobs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .stage > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -366,7 +366,7 @@ button.buy:disabled { opacity: .42; cursor: default; }
 }
 
 /* vote screen: the characters step out and this covers the whole stage */
-.discov { position: absolute; inset: 0; z-index: 4; pointer-events: auto; display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; background: rgba(12, 9, 24, .86); backdrop-filter: blur(1px); overflow: hidden; font-size: 13px; }
+.discov { position: absolute; inset: 0; z-index: 20; pointer-events: auto; display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; background: rgba(12, 9, 24, .86); backdrop-filter: blur(1px); overflow: hidden; font-size: 13px; }
 .discov[hidden] { display: none; }
 .discov .head { flex: none; }
 .dv-foe { flex: none; display: flex; gap: 10px; align-items: center; padding: 4px 8px; background: rgba(10, 8, 16, .75); border: 2px solid var(--red); }
@@ -378,16 +378,11 @@ button.buy:disabled { opacity: .42; cursor: default; }
 .dv-foe .foe-mv { font-size: 11px; }
 .discov .vtable { flex: 1 1 auto; min-height: 0; align-content: start; }
 .discov .lvpick { flex: none; }
-.main.vote-mode .party { display: none; }
-.main.vote-mode .panel { display: none; }
-.main.vote-mode .left { flex: 1 1 auto; min-height: 0; }
-.main.vote-mode .stage-wrap { flex: 1 1 auto; min-height: 0; container-type: size; align-items: stretch; }
-.main.vote-mode .stage { width: 100% !important; height: 100% !important; aspect-ratio: auto; max-width: none; }
-.main.vote-mode .stage > canvas { object-fit: cover; }
-@media (min-aspect-ratio: 5/4) and (min-width: 760px) { .main.vote-mode { grid-template-rows: minmax(0, 1fr); grid-template-areas: "stage"; } .main.vote-mode .stage-wrap { grid-area: stage; } }
+/* the stage keeps its size: the vote screen is laid over the whole play area (stage + party + command window) */
+.main.vote-mode .party, .main.vote-mode .panel { visibility: hidden; }
 .discov > .box { background: transparent; border: none; padding: 0; flex: 1 1 auto; min-height: 0; overflow: hidden; }
 .discov .vt-txt .loot-d { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
-.discov { background: rgba(12, 9, 24, .78); }
+.discov { background: rgba(12, 9, 24, .93); }
 @media (max-width: 620px) {
   .discov { font-size: 12px; gap: 4px; padding: 6px; }
   .discov h2 { font-size: 15px; }
@@ -610,6 +605,83 @@ button.buy:disabled { opacity: .42; cursor: default; }
 .vs-art { height: 100%; max-height: 11em; }
 .vs-pic { padding-top: .3em; }
 
+/* stat bars on the vote cards: length = value against the strongest of the four; the gold tail is what the item adds */
+.vs-stats { display: flex; flex-direction: column; gap: .2em; width: 100%; padding: 0 .2em; }
+.sbar { display: grid; grid-template-columns: 2.4em minmax(0, 1fr) auto; align-items: center; gap: .35em; font-size: .85em; }
+.sb-l { font-style: normal; color: var(--dim); text-align: left; white-space: nowrap; }
+.sb-t { position: relative; height: .7em; background: #0f0b1a; border: 1px solid #3a3160; overflow: hidden; }
+.sb-f { position: absolute; left: 0; top: 0; bottom: 0; }
+.sbar.hp .sb-f { background: linear-gradient(#7fe39a, #3fae62); }
+.sbar.atk .sb-f { background: linear-gradient(#ff9f7a, #d4553a); }
+.sb-g { position: absolute; top: 0; bottom: 0; background: #ffe066; box-shadow: 0 0 6px #ffcf40; animation: sb-blink .7s ease-in-out infinite alternate; }
+.sb-n { font-weight: 400; font-variant-numeric: tabular-nums; min-width: 2.2em; text-align: right; }
+.sb-n.up { color: #ffe066; }
+@keyframes sb-blink { from { opacity: .55; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sb-g { animation: none; } }
+
+/* ===== result board on the stage (after a win): slides in once the chest is open ===== */
+.rs { position: absolute; inset: 0; z-index: 4; pointer-events: none; display: flex; align-items: flex-start; justify-content: center; padding-top: 3.5%; }
+.rs[hidden] { display: none; }
+.rs-board { width: 90%; max-height: 66%; display: flex; flex-direction: column; gap: .8cqw; padding: 1.2cqw 1.8cqw; font-size: max(10px, 1.9cqw);
+  background: linear-gradient(180deg, rgba(20, 14, 38, .95), rgba(12, 9, 24, .92)); border: 2px solid var(--gold); box-shadow: 0 0 0 2px #0a0810, 0 .6cqw 2cqw rgba(0, 0, 0, .6);
+  animation: rs-in .45s cubic-bezier(.2, 1.4, .4, 1) 2.4s both; }
+.rs-head { display: flex; justify-content: space-between; align-items: baseline; color: var(--gold); letter-spacing: .12em; font-size: 1.05em; border-bottom: 1px solid rgba(232, 193, 90, .4); padding-bottom: .3em; }
+.rs-tot { color: var(--dim); letter-spacing: 0; font-size: .9em; }
+.rs-tot b { color: var(--ink); font-weight: 400; font-size: 1.25em; font-variant-numeric: tabular-nums; }
+.rs-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.6fr); gap: 1.6cqw; min-height: 0; }
+.rs-mvp { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .1em; padding: .4em .3em;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 210, 90, .35), rgba(255, 210, 90, 0) 70%); border: 1px solid rgba(232, 193, 90, .5); }
+.rs-art { height: 7cqw; width: auto; image-rendering: pixelated; filter: drop-shadow(0 0 .6cqw rgba(255, 210, 90, .8)); }
+.rs-crown { position: absolute; top: -.75em; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--gold-ink); padding: .05em .6em; font-size: 1.15em; letter-spacing: .15em; opacity: 0; }
+.rs.stamped .rs-crown { animation: rs-stamp .5s cubic-bezier(.2, 1.8, .4, 1) both; }
+.rs-mnm { font-size: 1.1em; color: #fff1a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.rs-ml { font-size: .8em; color: var(--dim); }
+.rs-big { font-weight: 400; font-size: 2.1em; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; text-shadow: 0 0 .4em rgba(255, 210, 90, .7); }
+.rs.stamped .rs-big { color: #ffe066; }
+.rs-rows { display: flex; flex-direction: column; justify-content: center; gap: .45em; min-width: 0; }
+.rs-row { display: grid; grid-template-columns: 1.2em minmax(4em, 7em) minmax(0, 1fr) 3.4em; grid-template-areas: "rk nm bar n" ". tg tg tg"; align-items: center; column-gap: .5em; animation: rs-row .35s ease-out both; }
+.rs-rk { grid-area: rk; color: var(--dim); text-align: center; }
+.rs-nm { grid-area: nm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rs-row.me .rs-nm { color: #a8d4ff; }
+.rs-bar { grid-area: bar; height: .85em; background: #0f0b1a; border: 1px solid #3a3160; position: relative; overflow: hidden; }
+.rs-f { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(#ffb48a, #e0583a); transition: width 1s cubic-bezier(.2, .8, .3, 1); }
+.rs-f.mvp { background: linear-gradient(#fff1a8, #e8a41a); box-shadow: 0 0 .8em rgba(255, 200, 60, .8); }
+.rs-n { grid-area: n; font-weight: 400; text-align: right; font-variant-numeric: tabular-nums; font-size: 1.15em; }
+.rs-row.mvp .rs-n { color: #ffe066; }
+.rs-tags { grid-area: tg; display: flex; gap: .4em; font-size: .78em; min-height: 0; }
+.rs-tags:empty { display: none; }
+.rs-tag { padding: 0 .4em; border: 1px solid var(--line); color: var(--dim); }
+.rs-tag.last { color: #ff8f85; border-color: #ff8f85; }
+.rs-tag.heal { color: #8fe3a0; border-color: #4f9a62; }
+.rs-tag.cover { color: #8fc0f7; border-color: #4f76a8; }
+@keyframes rs-in { from { opacity: 0; transform: translateY(-1.5cqw) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes rs-row { from { opacity: 0; transform: translateX(-1cqw); } to { opacity: 1; transform: none; } }
+@keyframes rs-stamp { 0% { opacity: 0; transform: translateX(-50%) scale(3) rotate(-12deg); } 60% { opacity: 1; transform: translateX(-50%) scale(.9) rotate(2deg); } 100% { opacity: 1; transform: translateX(-50%) scale(1); } }
+@container (max-width: 520px) { .rs-board { width: 96%; max-height: 74%; font-size: 10px; padding: 4px 6px; } .rs-row { grid-template-columns: 1em minmax(3em, 5em) minmax(0, 1fr) 2.8em; } .rs-tags { display: none; } .rs-art { height: 10cqw; } }
+@media (prefers-reduced-motion: reduce) { .rs-board, .rs-row, .rs.stamped .rs-crown { animation: none; opacity: 1; } .rs-f { transition: none; } }
+
+/* ===== ultimate cut-in ===== */
+.ultcut { position: absolute; inset: 0; z-index: 6; pointer-events: none; display: flex; align-items: center; overflow: hidden; }
+.ultcut[hidden] { display: none; }
+.uc-band { position: relative; width: 100%; height: 34%; display: flex; align-items: center; gap: 3cqw; padding: 0 6cqw;
+  background: linear-gradient(90deg, rgba(120, 70, 0, .0), rgba(255, 190, 60, .92) 12%, rgba(255, 230, 140, .95) 50%, rgba(255, 190, 60, .92) 88%, rgba(120, 70, 0, 0));
+  border-block: .5cqw solid #fff3c0; transform: skewY(-4deg); box-shadow: 0 0 4cqw rgba(255, 190, 60, .7); }
+.ultcut.go .uc-band { animation: uc-band 1.2s cubic-bezier(.2, .9, .3, 1) both; }
+.uc-art { height: 150%; width: auto; image-rendering: pixelated; transform: skewY(4deg); filter: drop-shadow(0 0 1cqw #fff) drop-shadow(.6cqw .6cqw 0 rgba(0, 0, 0, .5)); }
+.ultcut.go .uc-art { animation: uc-art 1.2s cubic-bezier(.2, .9, .3, 1) both; }
+.uc-txt { display: flex; flex-direction: column; transform: skewY(4deg); }
+.uc-who { font-size: max(10px, 2.2cqw); color: #3a2400; letter-spacing: .2em; }
+.uc-sk { font-size: max(18px, 6.4cqw); line-height: 1.05; color: #fff; letter-spacing: .06em;
+  text-shadow: 0 .08em 0 #8a4a00, .06em 0 0 #5a2c00, -.06em 0 0 #5a2c00, 0 -.06em 0 #5a2c00, 0 0 .5em rgba(255, 255, 255, .8); }
+.ultcut.go .uc-sk { animation: uc-punch 1.2s cubic-bezier(.2, 1.6, .4, 1) both; }
+.ultcut.evil .uc-band { background: linear-gradient(90deg, rgba(40, 0, 20, 0), rgba(140, 20, 60, .92) 12%, rgba(200, 40, 80, .95) 50%, rgba(140, 20, 60, .92) 88%, rgba(40, 0, 20, 0)); border-color: #ff9ab0; box-shadow: 0 0 4cqw rgba(200, 30, 70, .7); }
+.ultcut.evil .uc-who { color: #ffd0dc; }
+.ultcut.evil .uc-sk { text-shadow: 0 .08em 0 #4a0018, .06em 0 0 #2a000e, -.06em 0 0 #2a000e, 0 -.06em 0 #2a000e, 0 0 .5em rgba(255, 120, 150, .8); }
+@keyframes uc-band { 0% { transform: skewY(-4deg) translateX(-100%); } 18% { transform: skewY(-4deg) translateX(0); } 82% { transform: skewY(-4deg) translateX(0); opacity: 1; } 100% { transform: skewY(-4deg) translateX(30%); opacity: 0; } }
+@keyframes uc-art { 0% { transform: skewY(4deg) translateX(60cqw); } 22% { transform: skewY(4deg) translateX(0); } 80% { transform: skewY(4deg) translateX(-2cqw); } 100% { transform: skewY(4deg) translateX(-6cqw); } }
+@keyframes uc-punch { 0%, 20% { opacity: 0; transform: skewY(4deg) scale(2.2); } 34% { opacity: 1; transform: skewY(4deg) scale(.95); } 40%, 100% { opacity: 1; transform: skewY(4deg) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .ultcut.go .uc-band, .ultcut.go .uc-art, .ultcut.go .uc-sk { animation: none; } }
+
 </style>
 <div id="app" class="app">
   <header class="top">
@@ -633,10 +705,11 @@ button.buy:disabled { opacity: .42; cursor: default; }
           <div id="ov" class="ov">
             <div id="logo" class="logo"><div id="logo-t" class="logo-t">魔王の息子</div><div id="logo-s" class="logo-s">Son of the Demon King</div></div>
             <div id="foe" class="foe" hidden></div>
-            <div id="discov" class="discov" hidden></div>
             <div id="cutin" class="cutin" hidden></div>
             <div id="rolereveal" class="rolereveal" hidden></div>
             <div id="round" class="round" hidden></div>
+            <div id="result" class="rs" hidden></div>
+            <div id="ultcut" class="ultcut" hidden></div>
             <div id="banner" class="banner" role="status"></div>
             <div id="eplates"></div>
             <div id="hot"></div>
@@ -649,6 +722,7 @@ button.buy:disabled { opacity: .42; cursor: default; }
       <div id="party" class="party" hidden></div>
     </div>
     <div id="panel" class="panel"></div>
+    <div id="discov" class="discov" hidden></div>
   </div>
 </div>
 <script>
@@ -11382,13 +11456,15 @@ var SFX = (function () {
     var en = EN[S.enemy]; return !!(en.boss || en.last);
   }
 
+  /** ultimate gauge of a hero: engine state keeps .gauge, the published snapshot sends it as .g */
+  E.gaugeOf = function (h) { return h ? (h.gauge != null ? h.gauge : (h.g || 0)) : 0; };
   /** skills seat k can pick right now: [{id, ok, why}] (why: 'cd' | 'used') */
   E.skillList = function (S, k) {
     var b = S.bat, h = b.hs[k], js = JS[S.seats[k].job], out = [];
     ['basic', 'p1', 'p2', 'type', 'ult', 'rank'].forEach(function (slot) {
       if (!E.hasSkill(S, k, slot)) return;
       var id = js[slot], sk = SK[id], ok = true, why = null;
-      if (sk.ult && (h.gauge || 0) < P.ultGauge) { ok = false; why = 'gauge'; }
+      if (sk.ult && E.gaugeOf(h) < P.ultGauge) { ok = false; why = 'gauge'; }
       else if (h.cd[id] > 0) { ok = false; why = 'cd'; }
       out.push({ id: id, ok: ok, why: why, cd: h.cd[id] || 0 });
     });
@@ -12006,6 +12082,7 @@ var SFX = (function () {
     vs_voted: ['{0}に投票中（もう一度タップで取り消し）', 'You voted for {0} (tap again to take it back)'], no_vote: ['まだ票なし', 'No votes yet'],
     ult_ready: ['ゲージ満タン！ 今すぐ撃てる', 'Gauge full! Ready now'], ult_more: ['あと{0}回 技を使うと撃てる', '{0} more skill(s) to fill the gauge'],
     auto_tag: ['（時間切れでCPUが代行）', '(time ran out: CPU played)'],
+    rs_title: ['戦闘結果', 'Battle result'], rs_total: ['合計ダメージ', 'Total damage'],
     last_hit: ['とどめ', 'Final blow'], prev: ['前戦', 'Last fight'], prev_title: ['前の戦闘で与えたダメージ・回復・かばって受けたダメージ', 'Last battle: damage dealt, healing, damage taken while covering'],
     near_none: ['魔王軍の残りHPはあと{0}%だった…！', 'The enemy had only {0}% HP left…!'], near_son: ['魔王の息子の残りHP {0}%', 'The Son had {0}% HP left'], near_vil: ['平民チームの残りHP {0}%', 'The party had {0}% HP left'],
     son_share_a: ['{0}が道中で与えたダメージは全体の ', '{0} dealt '], son_share_b: ['（4人なら平均25%）', ' of the party\'s damage on the way (fair share: 25%)'],
@@ -12028,7 +12105,7 @@ var SFX = (function () {
     lg_alloc: ['{0}の案が成立：{1}', '{0}\'s split passed: {1}'], lg_buy: ['{0}が {1} を解放', '{0} unlocked {1}'], lg_rank: ['{0}がジョブアップ：{1}', '{0} evolved: {1}'],
     lg_expire: ['時間切れ：{0}ポイントが失効', 'Time up: {0} points expired'],
     sound_on: ['音：ON', 'Sound: on'], sound_off: ['音：OFF', 'Sound: off'], lang: ['English', '日本語'],
-    net_mqtt: ['ルーム {0} ・ {1}人 ・ v10', 'Room {0} ・ {1} here ・ v10'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
+    net_mqtt: ['ルーム {0} ・ {1}人 ・ v11', 'Room {0} ・ {1} here ・ v11'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
     code_title: ['ルームコードで集まる', 'Meet by room code'], code_make: ['ルームを作る（コードを発行）', 'Create a room (get a code)'], code_or: ['または 友達のコードで参加', 'or join with a friend\'s code'],
     code_ph: ['ルームコード（6文字）', 'Room code (6 letters)'], code_join: ['参加', 'Join'], code_bad: ['コードは英数字6文字です', 'The code is 6 letters or digits'],
     code_finding: ['ルーム {0} を探しています…', 'Looking for room {0}…'], code_none: ['ルームが見つかりません。コードを確かめるか、ホストが先に作っているか確認してください。', 'No room found. Check the code, and that the host has created it first.'],
@@ -12688,6 +12765,8 @@ var SFX = (function () {
   var bgCache = {}, frameCache = {}, bgId = null, heroes = [null, null, null, null], enemies = [];
   var stopUntil = 0, stopOff = 0, lastReal = 0, kick = { until: 0, amp: 0 };   // hit-stop: the picture freezes for a few frames on big hits
   var popups = [], timers = [], queue = [], busyUntil = 0, lastN = 0, battleKey = '', S = null, sonSeat = -1;
+  var combo = { n: 0, d: 0, t: -1e9 }, actSide = 'x', prevRdy = [0, 0, 0, 0];   // combo: the party's running damage total until the enemy moves
+  SCN.mvp = -1;
   var marks = { turn: -1, picks: [], sel: -1 }, dim = 0, dimTo = 0, revealKey = '', lastNow = 0, chest = null, itemCache = {}, jstone = null, evo = null, flashAll = 0;
 
   /* ---------------------------------------------------------------- sprites */
@@ -12783,7 +12862,8 @@ var SFX = (function () {
         battleKey = key; queue = []; timers = []; popups = []; FX.clear(); busyUntil = now;
         sonSeat = b.kind === 'final' ? b.son : -1;
         bgId = b.kind === 'final' ? 'throne_ruin' : E.EN[St.enemy].bg;
-        setHeroes(St, sonSeat);
+        setHeroes(St, sonSeat); combo = { n: 0, d: 0, t: -1e9 };
+        prevRdy = b.hs.map(function (h) { return h.st && h.st.rdy ? 1 : 0; });
         if (b.kind === 'final') setEnemies([{ art: 'son', v: St.seats[b.son].job }]);
         else setEnemies(b.en.map(function (u) { return { art: E.EN[St.enemy].art, v: u.v }; }));
         syncUnits();
@@ -12852,6 +12932,12 @@ var SFX = (function () {
       SCN.hp[i] = b.hs[i].hp;
       var a = unitActor(i);
       if (a) { a.st = Object.assign({}, b.hs[i].st); if (a.kind === 'hero') a.down = b.hs[i].hp <= 0; else if (b.hs[i].hp <= 0) a.gone = true; a.alpha = a.st.stealth ? 0.55 : 1; }
+      var rdy = b.hs[i].st && b.hs[i].st.rdy ? 1 : 0;
+      if (rdy && !prevRdy[i] && a && a.kind === 'hero' && !a.down) {   // the gauge just filled: make it an event
+        var rp = SCN.pos(i); popup({ x: rp.x, y: rp.top - 2 }, 'ULT READY!', '#ffd25a', 2); a.flash = 0.8;
+        FX.spawn('rankup', { x: rp.x, y: rp.y, sx: rp.x, sy: rp.y, seed: 50 + i }, lastNow); SCN.sfx('buff');
+      }
+      prevRdy[i] = rdy;
     }
     for (i = 0; i < b.en.length; i++) {
       SCN.hp[10 + i] = b.en[i].hp;
@@ -12890,8 +12976,11 @@ var SFX = (function () {
     if (rec.g !== undefined) { var o = SCN.pos(rec.t); FX.spawn('k_guard', { x: o.x, y: o.y, sx: o.x, sy: o.y, seed: 3 }, now); SCN.sfx('guard'); }
     if (rec.ctr !== undefined) { var k = SCN.pos(rec.ctr); FX.spawn('k_counter', { x: c.x, y: c.y, sx: k.x, sy: k.y, seed: 5 }, now); }
     var onHero = ref < 10 && ref !== sonSeat;
-    if (rec.u) hitStop(140, 5); else if (rec.c || rec.w) hitStop(80, 3); else if (rec.ko) hitStop(70, 2);
-    popup(c, rec.d, rec.w ? '#ff3b2f' : rec.c ? '#ffe34d' : onHero ? '#ff9a8a' : '#ffffff', rec.c || rec.w);
+    var um = S && S.bat ? (ref >= 10 ? S.bat.en[ref - 10] : S.bat.hs[ref]) : null, frac = um && um.mhp ? rec.d / um.mhp : 0;
+    var size = !onHero && (rec.u || frac >= 0.22) ? 3 : (rec.c || rec.w || frac >= 0.1) ? 2 : 1;
+    if (size === 3) hitStop(170, 6); else if (rec.c || rec.w) hitStop(90, 3); else if (rec.ko) hitStop(70, 2);
+    popup(c, rec.d, rec.w ? '#ff3b2f' : rec.c ? '#ffe34d' : onHero ? '#ff9a8a' : size === 3 ? '#fff1a8' : '#ffffff', size);
+    if (!onHero && actSide === 'h' && rec.d > 0) { combo.n++; combo.d += rec.d; combo.t = now; }
     if (rec.w && !onHero) { popup({ x: c.x, y: c.y + 10 }, 'WEAK!', '#ff3b2f'); a && (a.tint = '#ff2a1a', a.tintAmt = 0.5, setTimeout(function () { a.tintAmt = 0; }, 260)); }
     if (rec.c) popup({ x: c.x, y: c.y - 12 }, 'CRITICAL', '#ffe34d');
     SCN.hp[ref] = rec.hp;
@@ -12904,7 +12993,11 @@ var SFX = (function () {
     if (rec.ko && a) {
       at(now + 260, function () {
         if (a.kind === 'hero') { a.down = true; SCN.sfx('hero_down'); }
-        else { a.fade = lastNow; FX.spawn('enemy_die', { x: c.x, y: c.y, sx: c.x, sy: c.y, seed: 9 }, lastNow); SCN.sfx(a.def.w > 100 || a.art === 'son' ? 'boss_die' : 'enemy_die'); }
+        else {
+          var bigOne = a.def.w > 100 || a.art === 'son';
+          a.fade = lastNow; FX.spawn('enemy_die', { x: c.x, y: c.y, sx: c.x, sy: c.y, seed: 9 }, lastNow); SCN.sfx(bigOne ? 'boss_die' : 'enemy_die');
+          popup({ x: c.x, y: c.y - 14 }, 'K.O.!', '#ffe066', 3); hitStop(bigOne ? 320 : 160, bigOne ? 8 : 4); if (bigOne) flashAll = lastNow;
+        }
       });
     }
     if (SCN.onChange) SCN.onChange();
@@ -12933,6 +13026,7 @@ var SFX = (function () {
       dur = 380;
     } else if (e.k === 'act') {
       var sk = E.SK[e.s];
+      if (e.a < 10 && e.a !== sonSeat) actSide = 'h'; else { actSide = 'x'; combo = { n: 0, d: 0, t: -1e9 }; }
       a = unitActor(e.a); src = SCN.pos(e.a);
       if (SCN.onBanner) SCN.onBanner({ k: 'act', a: e.a, s: e.s, w: e.w, auto: e.auto });
       var pose = (sk.slot === 'basic' || (sk.pow && sk.job !== 3)) ? 'attack' : 'cast';
@@ -12941,10 +13035,17 @@ var SFX = (function () {
       setPose(a, pose, pose === 'cast' ? Math.max(520, fdur + 100) : 380, now);
       if (pose === 'attack') lunge(a, true, now);
       SCN.sfx(sk.ult ? 'ult' : sk.sfx);
-      if (sk.ult) { at(now + 220 + fdur * 0.55, function () { SCN.sfx(sk.sfx === 'ult' ? 'heavy' : sk.sfx); }); (e.r || []).forEach(function (rr) { if (rr.d) rr.u = 1; }); }
-      dur = 220 + castFx(e.s, e, src, now, now + 220) + 320;
+      var lead = 220;
+      if (sk.ult) {
+        lead = 950; dim = Math.max(dim, 0.55); dimTo = 0.55; at(now + 900, function () { dimTo = 0; });
+        if (SCN.onBanner) SCN.onBanner({ k: 'ult', a: e.a, s: e.s, son: e.a === sonSeat });
+        if (a) { a.flash = 1; setPose(a, a.def.poses.cast === undefined ? 'attack' : 'cast', 900, now); }
+        at(now + lead + fdur * 0.55, function () { SCN.sfx(sk.sfx === 'ult' ? 'heavy' : sk.sfx); }); (e.r || []).forEach(function (rr) { if (rr.d) rr.u = 1; });
+      }
+      dur = lead + castFx(e.s, e, src, now, now + lead) + 320;
     } else if (e.k === 'en') {
       var mv = E.EN[S.enemy].moves[e.m];
+      actSide = 'x'; combo = { n: 0, d: 0, t: -1e9 };
       a = unitActor(e.a); src = SCN.pos(e.a);
       if (SCN.onBanner) SCN.onBanner({ k: 'en', a: e.a, m: e.m });
       setPose(a, 'attack', 420, now); lunge(a, false, now);
@@ -12960,7 +13061,7 @@ var SFX = (function () {
     } else if (e.k === 'skip') {
       popup(SCN.pos(e.a), 'FROZEN', '#b0e0f5'); SCN.sfx('ice'); dur = 650;
     } else if (e.k === 'dot') {
-      SCN.sfx('poison');
+      SCN.sfx('poison'); actSide = 'h';
       e.r.forEach(function (rec, i) { at(now + 150 + i * 120, function () { result(rec); }); });
       dur = 850;
     } else if (e.k === 'tele') {
@@ -13058,6 +13159,14 @@ var SFX = (function () {
       if (en.fade !== undefined) { en.alpha = Math.max(0, 1 - (now - en.fade) / 550); if (en.alpha <= 0) { en.gone = true; delete en.fade; } }
       drawActor(en, now);
     }
+    var mvpOn = S && S.ph === 'reward' && SCN.mvp >= 0 && chest && now - chest.t0 > 3800 && heroes[SCN.mvp];
+    for (i = 0; i < 4; i++) if (heroes[i]) heroes[i].oy = 0;
+    if (mvpOn) {
+      var mp = SCN.pos(SCN.mvp), mt = now - chest.t0 - 3800;
+      FX.util.glow(fb, mp.x, mp.y, 26 + Math.sin(now / 150) * 3, '#ffd25a', 0.55);
+      heroes[SCN.mvp].oy = -Math.round(Math.abs(Math.sin(mt / 170)) * 5);
+      for (i = 0; i < 5; i++) { var sa = now / 500 + i * 1.256; FX.util.star(fb, Math.round(mp.x + Math.cos(sa) * 22), Math.round(mp.y + Math.sin(sa) * 26), 2, '#fff1a8', 1); }
+    }
     if (!SCN.hideHeroes) for (i = 0; i < 4; i++) drawActor(heroes[i], now);
     if (chest && S && S.ph === 'reward') drawChest(now); else chest = null;
     if (jstone !== null && S && S.ph === 'jobup') {
@@ -13104,8 +13213,15 @@ var SFX = (function () {
     popups = popups.filter(function (p) { return now - p.t0 < 950; });
     popups.forEach(function (p) {
       var k = (now - p.t0) / 950, y = p.y - 20 * (1 - (1 - k) * (1 - k));
-      fb.text(p.text, p.x, y, p.color, { align: 'center', outline: '#0a0810', scale: (p.big ? 2 : 1) + (k < 0.1 ? 1 : 0), alpha: k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1 });
+      var ps = p.big === 3 ? 3 : p.big ? 2 : 1;
+      fb.text(p.text, p.x, y, p.color, { align: 'center', outline: '#0a0810', scale: ps + (k < 0.12 ? (ps === 3 ? 2 : 1) : 0), alpha: k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1 });
     });
+    if (combo.n >= 2 && now - combo.t < 2600 && S && S.bat) {
+      var ca = now - combo.t > 2000 ? 1 - (now - combo.t - 2000) / 600 : 1, cpop = now - combo.t < 110 ? 1 : 0;
+      var ccol = combo.n >= 6 ? '#ff6a3a' : combo.n >= 4 ? '#ffd25a' : '#ffffff';
+      fb.text(combo.n + ' HIT', W - 6, 14, ccol, { align: 'right', outline: '#0a0810', scale: 1, alpha: ca });
+      fb.text(String(combo.d), W - 6, 22, ccol, { align: 'right', outline: '#0a0810', scale: 2 + cpop, alpha: ca });
+    }
     if (flashAll && now - flashAll < 450) { var fa2 = 0.85 * (1 - (now - flashAll) / 450); for (i = 0; i < fb.px.length; i++) fb.px[i] = G._mixP(fb.px[i], 0xFFFFFFFF, fa2); }
     if (fxr.flash) { var fc = G.C(fxr.flash[0]), fa = Math.min(0.9, fxr.flash[1]); for (i = 0; i < fb.px.length; i++) fb.px[i] = G._mixP(fb.px[i], fc, fa); }
     if (ctx) {
@@ -13545,7 +13661,11 @@ var SFX = (function () {
         h('div', { class: 'lvcol' }, [h('div', { class: 'lvh', text: T('lv_skill') }), skills.length ? h('div', { class: 'choices' }, skills) : h('p', { class: 'dim', text: T('lv_all') })]),
         h('div', { class: 'lvcol' }, [h('div', { class: 'lvh', text: T('lv_stat') }),
           h('button', { id: 'b-lvstat', type: 'button', class: 'btn choice stat', onclick: function () { SFX.init(); SFX.play('levelup'); ROOM.send({ t: 'lv', c: 'stat' }); } },
-            [h('b', { text: T('lv_stat') }), h('span', { class: 'sk-desc', text: T('lv_stat_d', hpUp, atkUp) })])])
+            [h('b', { text: T('lv_stat') }), (function () {
+              var me0 = E.heroStats(S, k), mh = me0.mhp + hpUp, ma = me0.atk + atkUp;
+              [0, 1, 2, 3].forEach(function (i) { var x = E.heroStats(S, i); mh = Math.max(mh, x.mhp); ma = Math.max(ma, x.atk); });
+              return h('span', { class: 'vs-stats' }, [statBar('HP', me0.mhp, me0.mhp + hpUp, mh, 'hp'), statBar(T('atk'), me0.atk, me0.atk + atkUp, ma, 'atk')]);
+            })()])])
       ])
     ]);
   }
@@ -13602,8 +13722,18 @@ var SFX = (function () {
   }
   /** one decision on screen: the thing to hand out, then who should get it.
       o: { title, icon, name, desc, arr (pick per seat), ok(j), eff(j), pick(j), id, queue: [nodes] } */
+  /** one stat as a bar: the filled part is now, a bright tail shows what the item would add */
+  function statBar(lbl, v, v2, max, cls) {
+    var up = v2 > v;
+    return h('span', { class: 'sbar ' + cls }, [h('i', { class: 'sb-l', text: lbl }),
+      h('span', { class: 'sb-t' }, [h('span', { class: 'sb-f', style: 'width:' + pct(v, max) }), up ? h('span', { class: 'sb-g', style: 'left:' + pct(v, max) + ';width:' + pct(v2 - v, max) }) : null]),
+      h('b', { class: 'sb-n' + (up ? ' up' : ''), text: up ? v + '→' + v2 : String(v) })]);
+  }
   function voteStage(S, o) {
     var k = me(), seated = k >= 0, mine = seated ? o.arr[k] : -1;
+    var stats = [0, 1, 2, 3].map(function (j) { var a = E.heroStats(S, j), b = o.after && o.ok(j) ? o.after(j, a) : a; return { a: a, b: b }; });
+    var maxHp = 1, maxAtk = 1;
+    stats.forEach(function (x) { maxHp = Math.max(maxHp, x.a.mhp, x.b.mhp); maxAtk = Math.max(maxAtk, x.a.atk, x.b.atk); });
     var cards = [0, 1, 2, 3].map(function (j) {
       var ok = o.ok(j), n = 0, who = [];
       for (var i = 0; i < 4; i++) if (o.arr[i] === j) { n++; who.push(i); }
@@ -13612,7 +13742,8 @@ var SFX = (function () {
         onclick: function () { SFX.init(); SFX.play(on ? 'ui_cancel' : 'ui_ok'); o.pick(j); } }, [
         h('span', { class: 'vs-pic' }, [portrait(S, j), on ? h('span', { class: 'vs-mine', text: T('my_pick') }) : null]),
         h('span', { class: 'vs-nm' }, [h('b', { text: seatName(S, j) }), j === k ? h('span', { class: 'tag you', text: T('you') }) : null]),
-        h('span', { class: 'vs-job', text: jobName(S, j) + ' ' + T('lv', S.pl[j].lv) + ' ・ HP' + hs.mhp + ' ・ ' + T('atk') + hs.atk }),
+        h('span', { class: 'vs-job', text: jobName(S, j) + ' ' + T('lv', S.pl[j].lv) }),
+        h('span', { class: 'vs-stats' }, [statBar('HP', hs.mhp, stats[j].b.mhp, maxHp, 'hp'), statBar(T('atk'), hs.atk, stats[j].b.atk, maxAtk, 'atk')]),
         h('span', { class: 'c-sk' }, skillChips(S, j)),
         h('span', { class: 'vs-eff' }, ok ? o.eff(j) : T('cant_give')),
         h('span', { class: 'vs-votes' }, [
@@ -13647,6 +13778,7 @@ var SFX = (function () {
       });
       kids.push(voteStage(S, { id: 'v' + cur.id, icon: cur.k, name: lootName(cur.k), desc: T('loot_' + cur.k + '_d'), arr: d.pk[cur.id] || [-1, -1, -1, -1],
         ok: function (j) { return E.canGive(S, cur.id, j); }, eff: function (j) { return lootEffect(S, cur.k, j); },
+        after: cur.k === 'sword' ? function (j, a) { return { mhp: a.mhp, atk: Math.round(a.atk * E.P.swordMul) }; } : null,
         pick: function (j) { ROOM.send({ t: 'pick', li: cur.id, to: j }); var nx = null; S.loot.forEach(function (L) { var a = d.pk[L.id] || [-1, -1, -1, -1]; if (!nx && L !== cur && a[k] < 0) nx = L; }); if (nx) root.setTimeout(function () { ui.curLoot = nx.id; sigs.panel = ''; render(); }, 650); },
         queue: S.loot.length > 1 ? queue : null }));
     }
@@ -13657,6 +13789,7 @@ var SFX = (function () {
     var kids = [h('div', { class: 'head' }, [h('h2', {}, [icon('rank', 22), ' ' + T('loot_rank')]), h('span', { class: 'dv-status', text: T('ju_title2') }), h('span', { class: 'time' }, [T('time_left') + ' ', timer(u.end)])])];
     kids.push(voteStage(S, { id: 'ju', icon: 'rank', name: T('loot_rank'), desc: T('loot_rank_d'), arr: u.pk,
       ok: function (j) { return E.canRank(S, j); },
+      after: function (j, a) { return { mhp: Math.round(a.mhp * E.P.rankHp), atk: Math.round(a.atk * E.P.rankAtk) }; },
       eff: function (j) { var job = E.JOBS[S.seats[j].job]; return '→ ' + N(job.rn) + '（' + skillName(E.JOB_SKILLS[S.seats[j].job].rank) + '）'; },
       pick: function (j) { ROOM.send({ t: 'jpick', to: j }); } }));
     return [h('div', { class: 'box fill' }, kids)];
@@ -13720,25 +13853,12 @@ var SFX = (function () {
     kids.push(btn('b-go', T('confirm'), sendAct, { cls: 'primary big', disabled: !ui.skill || (need && ui.target < 0) }));
     return [h('div', { class: 'box' }, kids)];
   }
-  /** who did what: one cell per character with damage / healing / covering, the best one crowned */
-  function contrib(S, st, crown, last) {
-    return h('div', { class: 'contrib' }, [0, 1, 2, 3].map(function (j) {
-      var o = st[j], top = j === crown;
-      return h('div', { class: 'ct' + (top ? ' mvp' : '') + (j === me() ? ' me' : '') }, [
-        h('span', { class: 'ct-nm' }, [top ? h('b', { class: 'crown', text: 'MVP' }) : null, seatName(S, j)]),
-        h('span', { class: 'ct-n' }, [h('i', { text: T('ct_d') }), h('b', { text: o.d })]),
-        o.h ? h('span', { class: 'ct-n heal' }, [h('i', { text: T('ct_h') }), h('b', { text: o.h })]) : null,
-        o.c ? h('span', { class: 'ct-n cover' }, [h('i', { text: T('ct_c') }), h('b', { text: o.c })]) : null,
-        j === last ? h('span', { class: 'ct-last', text: T('last_hit') }) : null]);
-    }));
-  }
   function panelReward(S) {
     var k = me(), rw = S.rw, kids = [h('div', { class: 'head' }, [h('h2', { text: T('reward_title') }), h('span', { class: 'time' }, timer(rw.end))])];
     var gains = [];
     if (rw.st) gains.push(h('span', { class: 'gain-i' }, [icon('lv', 22), T('stones_got', rw.st)]));
     if (rw.item) gains.push(h('span', { class: 'gain-i' + (rw.item === 'rank' ? ' rank' : '') }, [icon(rw.item, 22), rw.item === 'rank' ? T('chest_rank') : T('chest_got', lootName(rw.item))]));
     if (gains.length) kids.push(h('div', { class: 'gains' }, gains));
-    if (S.bs) kids.push(contrib(S, S.bs, rw.mvp, rw.last));
     if (k >= 0) {
       if (S.pl[k].lvq > 0) kids.push(lvPicker(S, k));
       else kids.push(h('p', { class: 'dim', text: T('lv_done') + ' ・ ' + T('waiting_others') }));
@@ -13796,22 +13916,22 @@ var SFX = (function () {
     renderHot();
     fitLayout();
   }
-  /* stacked (tall) layout: shrink the stage so the current panel fits without scrolling */
+  /* the stage keeps one size for the whole game: it depends on the window only, never on what the panel below shows.
+     wide: the stage takes a fixed share of the height, the party row sits under it, the panel gets the rest (and scrolls inside if it must).
+     tall (phones): the stage is as wide as the screen allows. */
   var WIDE = root.matchMedia ? root.matchMedia('(min-aspect-ratio: 5/4) and (min-width: 760px)') : null;
   function fitLayout() {
-    var stage = $('stage'), panel = $('panel'), box = panel.firstElementChild;
-    if (WIDE && WIDE.matches) {   // wide: the panel row gets exactly the height its content needs (up to 62% of the screen); the stage takes the rest
-      stage.style.width = '';
-      if (box) { box.style.flex = 'none'; var nd = box.offsetHeight; box.style.flex = ''; panel.style.height = Math.min(nd + 4, Math.round(root.innerHeight * 0.62)) + 'px'; } else panel.style.height = '';
-      return;
-    }
-    panel.style.height = '';
-    if (!box) { stage.style.width = ''; return; }
-    box.style.flex = 'none'; var need = box.offsetHeight; box.style.flex = '';
-    var top = doc.querySelector('.top').offsetHeight, party = $('party').hidden ? 0 : $('party').offsetHeight;
-    var avail = root.innerHeight - 12 - top - party - 6 * (party ? 3 : 2) - need - 6;
-    var w = Math.max(240, Math.min($('app').clientWidth, avail * 384 / 216));
-    stage.style.width = Math.floor(w) + 'px';
+    var stage = $('stage'), panel = $('panel'), app = $('app');
+    var vw = app.clientWidth, vh = root.innerHeight, wide = !!(WIDE && WIDE.matches), key = vw + 'x' + vh + (wide ? 'w' : 't');
+    if (ui.fitKey === key) return;
+    ui.fitKey = key; panel.style.height = '';
+    var top = doc.querySelector('.top').offsetHeight, w;
+    if (wide) {
+      var mainH = vh - 12 - top - 6, side = Math.max(330, Math.min(480, Math.round(vw * 0.3)));   // command window width; the party row (~108px) sits under the stage
+      w = Math.min(vw - side - 8, Math.floor((mainH - 114) * 384 / 216));
+    } else w = Math.min(vw, Math.floor((vh - 12 - top - 400) * 384 / 216));
+    stage.style.width = Math.max(240, w) + 'px';
+    alignParty();
   }
   UI.fit = fitLayout;
   /* the party plates sit right under the characters: the row is exactly as wide as the stage */
@@ -13849,9 +13969,21 @@ var SFX = (function () {
     root.clearTimeout(bannerTimer);
     bannerTimer = root.setTimeout(function () { el.className = 'banner'; }, ms);
   }
+  /** the ultimate cut-in: a band sweeps across the stage with the caster up close and the skill name punched in */
+  var ultTimer = 0;
+  function showUltCut(S, o) {
+    var el = $('ultcut'), job = E.JOBS[S.seats[o.a].job], art;
+    if (o.son) art = SCN.thumb('enemy', 'son', S.seats[o.a].job, 1); else art = SCN.thumb('hero', S.pl[o.a].rank ? job.rank : job.id, 0, 1);
+    art.className = 'px uc-art'; art.style.width = ''; art.style.height = '';
+    el.className = 'ultcut' + (o.son ? ' evil' : '');
+    swap(el, [h('div', { class: 'uc-band' }, [art, h('div', { class: 'uc-txt' }, [h('span', { class: 'uc-who', text: unitName(S, o.a) }), h('span', { class: 'uc-sk', text: skillName(o.s) })])])]);
+    el.hidden = false; void el.offsetWidth; el.classList.add('go');
+    root.clearTimeout(ultTimer); ultTimer = root.setTimeout(function () { el.hidden = true; el.textContent = ''; }, 1250);
+  }
   SCN.onBanner = function (o) {
     var S = cur(), txt = '';
     if (!S || !S.bat) return;
+    if (o.k === 'ult') { showUltCut(S, o); return; }
     if (o.k === 'start') txt = S.bat.kind === 'final' ? T('appear_final', seatName(S, S.bat.son)) : T('appear', N(E.EN[S.enemy].n));
     else if (o.k === 'round') { $('round').textContent = T('round', o.r); return; }
     else if (o.k === 'act') txt = T('uses', unitName(S, o.a), skillName(o.s)) + (o.w ? ' ' + T('weak_hit') : '') + (o.auto ? ' ' + T('auto_tag') : '');
@@ -13872,9 +14004,8 @@ var SFX = (function () {
     doc.querySelector('.main').classList.toggle('vote-mode', on);
     ov.hidden = !on;
     if (!on) ov.textContent = '';
-    $('party').hidden = on || !S;
+    $('party').hidden = !S;
     sigs.party = '';
-    fitLayout(); alignParty();
   }
   function renderStage() {
     var v = ROOM.view, S = v && v.S, ph = S ? S.ph : v ? 'lobby' : 'title';
@@ -13893,6 +14024,54 @@ var SFX = (function () {
         h('div', { class: 'ev3', text: N(E.SK[E.JOB_SKILLS[ej].rank].d) + ' ・ ' + powerText(E.JOB_SKILLS[ej].rank, E.heroStats(S, S.evo.to).atk) })]);
     }
     if (ph === 'reveal') swap(big, [h('div', { class: 'rv1', text: T('reveal_1') }), h('div', { class: 'rv2', text: T('reveal_2', seatName(S, S.son), jobName(S, S.son)) }), h('div', { class: 'rv3', text: T('reveal_3') })]);
+  }
+
+  /** after a win the stage itself shows the result: first the chest, then a board with every character's damage counting up
+      as a bar, and the MVP stamped in gold (the MVP also glows on the stage) */
+  function renderResult() {
+    var S = cur(), el = $('result'), on = !!S && S.ph === 'reward' && !!S.bs && S.rw && S.rw.mvp >= 0;
+    SCN.mvp = on ? S.rw.mvp : -1;
+    if (!changed('result', on ? ['rs', S.stage, S.rw.mvp, root.LANG] : 'off')) return;
+    el.hidden = !on;
+    if (!on) { el.textContent = ''; return; }
+    var bs = S.bs, mvp = S.rw.mvp, tot = 0, top = 1, nums = [];
+    bs.forEach(function (o) { tot += o.d; top = Math.max(top, o.d); });
+    var order = [0, 1, 2, 3].sort(function (a, b) { return bs[b].d - bs[a].d; });
+    var rows = order.map(function (j, n) {
+      var o = bs[j], num = h('b', { class: 'rs-n', text: '0' }), fill = h('span', { class: 'rs-f' + (j === mvp ? ' mvp' : '') });
+      nums.push({ el: num, v: o.d }); fill.dataset.w = pct(o.d, top);
+      var tags = [];
+      if (j === S.rw.last) tags.push(h('span', { class: 'rs-tag last', text: T('last_hit') }));
+      if (o.h) tags.push(h('span', { class: 'rs-tag heal', text: T('ct_h') + o.h }));
+      if (o.c) tags.push(h('span', { class: 'rs-tag cover', text: T('ct_c') + o.c }));
+      return h('div', { class: 'rs-row' + (j === mvp ? ' mvp' : '') + (j === me() ? ' me' : ''), style: 'animation-delay:' + (2.5 + n * 0.12).toFixed(2) + 's' }, [
+        h('span', { class: 'rs-rk', text: String(n + 1) }),
+        h('span', { class: 'rs-nm', text: seatName(S, j) }),
+        h('span', { class: 'rs-bar' }, [fill]), num, h('span', { class: 'rs-tags' }, tags)]);
+    });
+    var job = E.JOBS[S.seats[mvp].job], art = SCN.thumb('hero', S.pl[mvp].rank ? job.rank : job.id, 0, 1);
+    art.className = 'px rs-art'; art.style.width = ''; art.style.height = '';
+    var mvpNum = h('b', { class: 'rs-big', text: '0' }); nums.push({ el: mvpNum, v: bs[mvp].d });
+    swap(el, [h('div', { class: 'rs-board' }, [
+      h('div', { class: 'rs-head' }, [h('span', { text: T('rs_title') }), h('span', { class: 'rs-tot' }, [T('rs_total') + ' ', h('b', { text: String(tot) })])]),
+      h('div', { class: 'rs-body' }, [
+        h('div', { class: 'rs-mvp' }, [h('span', { class: 'rs-crown', text: 'MVP' }), art, h('span', { class: 'rs-mnm', text: seatName(S, mvp) }), h('span', { class: 'rs-ml', text: T('ct_d') }), mvpNum]),
+        h('div', { class: 'rs-rows' }, rows)])])]);
+    // count up once the board is in, then stamp the MVP
+    var t0 = null, D = 1000, START = 2700;
+    root.setTimeout(function () {
+      if (el.hidden) return;
+      el.querySelectorAll('.rs-f').forEach(function (f) { f.style.width = f.dataset.w; });
+      SFX.play('stone');
+      (function step(ts) {
+        if (el.hidden) return;
+        if (t0 === null) t0 = ts;
+        var k = Math.min(1, (ts - t0) / D), e2 = 1 - Math.pow(1 - k, 3);
+        nums.forEach(function (x) { x.el.textContent = String(Math.round(x.v * e2)); });
+        if (k < 1) root.requestAnimationFrame(step);
+      })(root.performance.now());
+    }, START);
+    root.setTimeout(function () { if (!el.hidden) { nums.forEach(function (x) { x.el.textContent = String(x.v); }); el.classList.add('stamped'); SFX.play('rankup'); } }, START + D + 150);
   }
 
   /* ------------------------------------------------------------------ game log lines appear as a banner on the stage */
@@ -13938,7 +14117,7 @@ var SFX = (function () {
     var v = ROOM.view, S = v && v.S;
     SCN.apply(S || null);
     if (v && !S && !ROOM.joined && !ui.left && !ROOM.hostGone && ((v.L.players || []).length < 4)) { if (!NET.me.name) ROOM.rename(autoName()); ROOM.send({ t: 'join' }); }
-    renderTop(); renderStage(); renderCutin(); renderRoleReveal(); renderFoe(); renderMode(); renderParty(); renderPanel(); renderPlates(); renderHot(); renderSide(); music();
+    renderTop(); renderStage(); renderCutin(); renderRoleReveal(); renderFoe(); renderMode(); renderResult(); renderParty(); renderPanel(); renderPlates(); renderHot(); renderSide(); music();
   }
   UI.render = render;
 
