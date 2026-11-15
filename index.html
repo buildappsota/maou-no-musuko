@@ -12127,7 +12127,7 @@ var SFX = (function () {
     lg_alloc: ['{0}の案が成立：{1}', '{0}\'s split passed: {1}'], lg_buy: ['{0}が {1} を解放', '{0} unlocked {1}'], lg_rank: ['{0}がジョブアップ：{1}', '{0} evolved: {1}'],
     lg_expire: ['時間切れ：{0}ポイントが失効', 'Time up: {0} points expired'],
     sound_on: ['音：ON', 'Sound: on'], sound_off: ['音：OFF', 'Sound: off'], lang: ['English', '日本語'],
-    net_mqtt: ['ルーム {0} ・ {1}人 ・ v12', 'Room {0} ・ {1} here ・ v12'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
+    net_mqtt: ['ルーム {0} ・ {1}人 ・ v13', 'Room {0} ・ {1} here ・ v13'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
     code_title: ['ルームコードで集まる', 'Meet by room code'], code_make: ['ルームを作る（コードを発行）', 'Create a room (get a code)'], code_or: ['または 友達のコードで参加', 'or join with a friend\'s code'],
     code_ph: ['ルームコード（6文字）', 'Room code (6 letters)'], code_join: ['参加', 'Join'], code_bad: ['コードは英数字6文字です', 'The code is 6 letters or digits'],
     code_finding: ['ルーム {0} を探しています…', 'Looking for room {0}…'], code_none: ['ルームが見つかりません。コードを確かめるか、ホストが先に作っているか確認してください。', 'No room found. Check the code, and that the host has created it first.'],
@@ -13000,7 +13000,7 @@ var SFX = (function () {
     var onHero = ref < 10 && ref !== sonSeat;
     var um = S && S.bat ? (ref >= 10 ? S.bat.en[ref - 10] : S.bat.hs[ref]) : null, frac = um && um.mhp ? rec.d / um.mhp : 0;
     var size = !onHero && (rec.u || frac >= 0.22) ? 3 : (rec.c || rec.w || frac >= 0.1) ? 2 : 1;
-    if (size === 3) hitStop(170, 6); else if (rec.c || rec.w) hitStop(90, 3); else if (rec.ko) hitStop(70, 2);
+    if (size === 3) hitStop(170, 4); else if (rec.c || rec.w) hitStop(90, 0); else if (rec.ko) hitStop(70, 0);   // only the really big hits shake; the rest just pause
     popup(c, rec.d, rec.w ? '#ff3b2f' : rec.c ? '#ffe34d' : onHero ? '#ff9a8a' : size === 3 ? '#fff1a8' : '#ffffff', size);
     if (!onHero && actSide === 'h' && rec.d > 0) { combo.n++; combo.d += rec.d; combo.t = now; }
     if (rec.w && !onHero) { popup({ x: c.x, y: c.y + 10 }, 'WEAK!', '#ff3b2f'); a && (a.tint = '#ff2a1a', a.tintAmt = 0.5, setTimeout(function () { a.tintAmt = 0; }, 260)); }
@@ -13018,7 +13018,7 @@ var SFX = (function () {
         else {
           var bigOne = a.def.w > 100 || a.art === 'son';
           a.fade = lastNow; FX.spawn('enemy_die', { x: c.x, y: c.y, sx: c.x, sy: c.y, seed: 9 }, lastNow); SCN.sfx(bigOne ? 'boss_die' : 'enemy_die');
-          popup({ x: c.x, y: c.y - 14 }, 'K.O.!', '#ffe066', 3); hitStop(bigOne ? 320 : 160, bigOne ? 8 : 4); if (bigOne) flashAll = lastNow;
+          popup({ x: c.x, y: c.y - 14 }, 'K.O.!', '#ffe066', 3); hitStop(bigOne ? 320 : 160, bigOne ? 5 : 0); if (bigOne) flashAll = lastNow;
         }
       });
     }
@@ -13248,7 +13248,8 @@ var SFX = (function () {
     if (fxr.flash) { var fc = G.C(fxr.flash[0]), fa = Math.min(0.9, fxr.flash[1]); for (i = 0; i < fb.px.length; i++) fb.px[i] = G._mixP(fb.px[i], fc, fa); }
     if (ctx) {
       var sx = 0, sy = 0;
-      if (now < kick.until) fxr.shake = Math.max(fxr.shake || 0, kick.amp * (kick.until - now) / 280);
+      fxr.shake = (fxr.shake || 0) >= 3 ? fxr.shake * 0.5 : 0;   // small effect rumbles are dropped, big ones are halved
+      if (now < kick.until && kick.amp > 0) fxr.shake = Math.max(fxr.shake, kick.amp * (kick.until - now) / 280);
       if (fxr.shake > 0) { sx = Math.round((Math.random() - 0.5) * 2 * fxr.shake); sy = Math.round((Math.random() - 0.5) * 2 * fxr.shake); ctx.fillStyle = '#0a0810'; ctx.fillRect(0, 0, W, H); }
       ctx.putImageData(img, sx, sy);
     }
