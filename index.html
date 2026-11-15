@@ -38,7 +38,7 @@ ul, ol { margin: 0; padding-left: 1.2em; }
 .eyebrow { color: var(--dim); font-size: 11px; letter-spacing: .1em; }
 
 /* one screen, no page scroll: top bar / (stage + party) / panel.
-   Wide screens put the panel beside the stage; tall screens put it underneath. */
+   Wide screens lay the panel over the bottom of the stage as a sheet; tall screens put it underneath. */
 .app { height: 100%; display: flex; flex-direction: column; gap: 6px; }
 .top { flex: none; display: flex; gap: 6px; align-items: center; min-height: 26px; }
 .net { font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -54,16 +54,36 @@ ul, ol { margin: 0; padding-left: 1.2em; }
 .panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: auto; }
 /* wide screens and fullscreen: see the block below */
 @media (min-aspect-ratio: 5/4) and (min-width: 760px) {
-  /* wide screens: stage with the party plates under it on the left, the command window on the right (full height) */
-  .main { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "stage panel" "party panel"; align-items: start; column-gap: 8px; }
-  .left { display: contents; }
-  .stage-wrap { grid-area: stage; min-height: 0; }
-  .main .party { grid-area: party; align-self: start; }
-  .main .panel { grid-area: panel; align-self: stretch; min-height: 0; }
-  .main .panel > .box.fill { flex: 0 0 auto; }
-  .main .skills { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .main .jobs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* wide screens: the stage takes the whole width it can (one fixed size), the party plates sit under it,
+     and the command window is a sheet laid over the bottom of the stage — shown only when there is something to do. */
+  .main .party { height: var(--party-h, 76px); overflow: hidden; align-content: start; }
 }
+/* the sheet (wide screens only: the panel is moved inside the stage by fitLayout) */
+.stage > .panel { position: absolute; left: 1.2%; right: 1.2%; bottom: 1.6%; z-index: 12; max-height: 62%; min-height: 0; flex: none; overflow: auto;
+  font-size: clamp(12px, 1.25cqw, 16px); filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .55)); }
+.stage > .panel:empty, .stage > .panel.m-none { display: none; }
+.stage > .panel > .box { background: rgba(16, 12, 30, .9); border-color: #5a4f86; padding: clamp(6px, .9cqw, 12px) clamp(8px, 1.2cqw, 16px); gap: clamp(4px, .6cqw, 8px); }
+.stage > .panel > .box.fill { flex: 0 0 auto; }
+.stage > .panel.m-bat { max-height: 45%; }
+.stage > .panel.m-rw { max-height: 42%; }
+.stage > .panel.m-bat .skills { grid-template-columns: repeat(auto-fit, minmax(min(150px, 30%), 1fr)); }
+.stage > .panel.m-bat .head h2 { font-size: 1.15em; }
+.actrow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.actrow > .eyebrow { flex: 1 0 100%; margin: 0; }
+.actrow > #b-go { flex: 1 1 100%; }
+.stage > .panel .actrow > .eyebrow { flex: 0 0 auto; }
+.stage > .panel .actrow > #b-go { flex: 0 0 auto; margin-left: auto; min-width: 9em; }
+/* watching / waiting: only a small tag in the top-left corner, the scene stays clear */
+.stage > .panel.m-pill { left: 1.5%; right: auto; top: 10%; bottom: auto; max-width: 46%; overflow: hidden; filter: none; }
+.stage > .panel.m-pill > .box { padding: 2px 9px; gap: 0; background: rgba(10, 8, 16, .72); border-width: 1px; }
+.stage > .panel.m-pill .head h2 { font-size: max(11px, 1.7cqw); margin: 0; }
+.stage > .panel.m-pill .head .time:empty, .stage > .panel.m-pill .head ~ p.dim { display: none; }
+.stage > .panel.m-pill p { margin: 0; font-size: max(11px, 1.6cqw); }
+.stage > .panel.enter { animation: sheet-in .22s ease-out; }
+.stage > .panel.m-pill.enter { animation: pill-in .2s ease-out; }
+@keyframes sheet-in { from { transform: translateY(14%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pill-in { from { transform: translateX(-12px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .stage > .panel.enter { animation: none; } }
 
 .stage > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .ov { position: absolute; inset: 0; pointer-events: none; }
@@ -620,7 +640,7 @@ button.buy:disabled { opacity: .42; cursor: default; }
 @media (prefers-reduced-motion: reduce) { .sb-g { animation: none; } }
 
 /* ===== result board on the stage (after a win): slides in once the chest is open ===== */
-.rs { position: absolute; inset: 0; z-index: 4; pointer-events: none; display: flex; align-items: flex-start; justify-content: center; padding-top: 3.5%; }
+.rs { position: absolute; inset: 0; z-index: 4; pointer-events: none; display: flex; align-items: flex-start; justify-content: center; padding-top: 3.5%; padding-bottom: var(--sheet-h, 0px); }
 .rs[hidden] { display: none; }
 .rs-board { width: 90%; max-height: 66%; display: flex; flex-direction: column; gap: .8cqw; padding: 1.2cqw 1.8cqw; font-size: max(10px, 1.9cqw);
   background: linear-gradient(180deg, rgba(20, 14, 38, .95), rgba(12, 9, 24, .92)); border: 2px solid var(--gold); box-shadow: 0 0 0 2px #0a0810, 0 .6cqw 2cqw rgba(0, 0, 0, .6);
@@ -681,6 +701,8 @@ button.buy:disabled { opacity: .42; cursor: default; }
 @keyframes uc-art { 0% { transform: skewY(4deg) translateX(60cqw); } 22% { transform: skewY(4deg) translateX(0); } 80% { transform: skewY(4deg) translateX(-2cqw); } 100% { transform: skewY(4deg) translateX(-6cqw); } }
 @keyframes uc-punch { 0%, 20% { opacity: 0; transform: skewY(4deg) scale(2.2); } 34% { opacity: 1; transform: skewY(4deg) scale(.95); } 40%, 100% { opacity: 1; transform: skewY(4deg) scale(1); } }
 @media (prefers-reduced-motion: reduce) { .ultcut.go .uc-band, .ultcut.go .uc-art, .ultcut.go .uc-sk { animation: none; } }
+.stage:has(> .panel.m-rw:not(:empty)) .rs-board { max-height: 100%; }
+.stage > .panel.m-std { right: auto; left: 0; right: 0; margin-inline: auto; width: min(860px, 97.6%); }
 
 </style>
 <div id="app" class="app">
@@ -12105,7 +12127,7 @@ var SFX = (function () {
     lg_alloc: ['{0}の案が成立：{1}', '{0}\'s split passed: {1}'], lg_buy: ['{0}が {1} を解放', '{0} unlocked {1}'], lg_rank: ['{0}がジョブアップ：{1}', '{0} evolved: {1}'],
     lg_expire: ['時間切れ：{0}ポイントが失効', 'Time up: {0} points expired'],
     sound_on: ['音：ON', 'Sound: on'], sound_off: ['音：OFF', 'Sound: off'], lang: ['English', '日本語'],
-    net_mqtt: ['ルーム {0} ・ {1}人 ・ v11', 'Room {0} ・ {1} here ・ v11'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
+    net_mqtt: ['ルーム {0} ・ {1}人 ・ v12', 'Room {0} ・ {1} here ・ v12'], net_mqtt_off: ['コードで参加', 'Join by code'], net_mqtt_bad: ['サーバーに接続できません。再試行中…', 'Cannot reach the server. Retrying…'],
     code_title: ['ルームコードで集まる', 'Meet by room code'], code_make: ['ルームを作る（コードを発行）', 'Create a room (get a code)'], code_or: ['または 友達のコードで参加', 'or join with a friend\'s code'],
     code_ph: ['ルームコード（6文字）', 'Room code (6 letters)'], code_join: ['参加', 'Join'], code_bad: ['コードは英数字6文字です', 'The code is 6 letters or digits'],
     code_finding: ['ルーム {0} を探しています…', 'Looking for room {0}…'], code_none: ['ルームが見つかりません。コードを確かめるか、ホストが先に作っているか確認してください。', 'No room found. Check the code, and that the host has created it first.'],
@@ -13813,7 +13835,8 @@ var SFX = (function () {
       h('h2', { text: b.over ? T(b.over === 'win' ? 'win' : 'lose') : mine ? T('your_turn') : cs >= 0 ? T('turn_of', seatName(S, cs)) : T('enemy_turn') }),
       h('span', { class: 'time' }, [mine && b.end ? timer(b.end) : null])
     ]);
-    ui.picks = [];
+    ui.picks = []; ui.pmode = 'bat';
+    if (!mine || busy) ui.pmode = 'pill';
     if (!mine || busy) return [h('div', { class: 'box' }, [head, h('p', { class: 'dim', text: k < 0 ? T('spectate') : T('watching') })])];
     var list = E.skillList(S, k), kids = [head];
     if (!(S.pl[k].sk & E.BIT.ult)) list = list.concat([{ id: E.JOB_SKILLS[S.seats[k].job].ult, ok: false, why: 'lock' }]);
@@ -13828,18 +13851,18 @@ var SFX = (function () {
         sk.ult && o.why !== 'lock' ? gaugeEl(g, true) : null,
         h('span', { class: 'sk-desc', text: ready ? T('ult_ready') : o.ok ? N(sk.d) : o.why === 'lock' ? T('ult_lock_b', ultLeft(S, k)) : o.why === 'gauge' ? T('ult_more', E.P.ultGauge - g) : T('cd_left', o.cd) })]);
     })));
-    var need = false;
+    var need = false, act = [];
     if (ui.skill) {
       var sk2 = E.SK[ui.skill], tl2 = E.targetList(S, k, ui.skill);
       need = sk2.tg === 'foe' || sk2.tg === 'ally';
       if (need) {
         ui.picks = tl2;
-        kids.push(h('div', { class: 'eyebrow', text: T('pick_target') }));
-        kids.push(h('div', { class: 'row wrap' }, tl2.map(function (r) {
+        act.push(h('span', { class: 'eyebrow', text: T('pick_target') }));
+        act = act.concat(tl2.map(function (r) {
           var hp = SCN.hp[r], m = r >= 10 ? b.en[r - 10].mhp : b.hs[r].mhp;
           return h('button', { id: 'tg-' + r, type: 'button', class: 'btn tgt' + (ui.target === r ? ' sel' : ''), 'aria-pressed': String(ui.target === r),
             onclick: function () { SFX.play('ui_move'); ui.target = r; render(); } }, [h('span', { text: unitName(S, r) }), bar(hp, m, r >= 10 || r === b.son ? 'e' : '')]);
-        })));
+        }));
       }
     }
     var gl = E.guardList(S, k);
@@ -13850,7 +13873,8 @@ var SFX = (function () {
         return h('button', { id: 'gd-' + r, type: 'button', class: 'btn tgt' + (ui.guard === r ? ' sel' : ''), 'aria-pressed': String(ui.guard === r), onclick: function () { SFX.play('ui_move'); ui.guard = r; render(); } }, seatName(S, r));
       }).concat([h('button', { id: 'gd-x', type: 'button', class: 'btn tgt' + (ui.guard === -1 ? ' sel' : ''), 'aria-pressed': String(ui.guard === -1), onclick: function () { ui.guard = -1; render(); } }, T('guard_none'))])));
     }
-    kids.push(btn('b-go', T('confirm'), sendAct, { cls: 'primary big', disabled: !ui.skill || (need && ui.target < 0) }));
+    act.push(btn('b-go', T('confirm'), sendAct, { cls: 'primary big', disabled: !ui.skill || (need && ui.target < 0) }));
+    kids.push(h('div', { class: 'actrow' }, act));
     return [h('div', { class: 'box' }, kids)];
   }
   function panelReward(S) {
@@ -13887,7 +13911,7 @@ var SFX = (function () {
     return [h('div', { class: 'box center' }, kids)];
   }
   function renderPanel() {
-    var v = ROOM.view, S = v && v.S, el = $('panel'), kids, key, target = el;
+    var v = ROOM.view, S = v && v.S, el = $('panel'), kids, key, target = el, pm = 'std';
     if (ROOM.hostGone) {
       if (!changed('panel', ['gone', root.LANG])) return;
       swap(el, [h('div', { class: 'box center' }, [h('p', { class: 'lead', text: T('host_gone') }), btn('b-new', T('new_room'), function () { if (NET.mode === 'mqtt') leaveRoomNow(); else ROOM.forget(); })])]);
@@ -13904,34 +13928,44 @@ var SFX = (function () {
       if (ui.turnKey !== S.stage + ':' + tk) { ui.turnKey = S.stage + ':' + tk; ui.skill = null; ui.target = -1; ui.guard = b.g; if (b.cs === k && k >= 0) { SFX.play('turn'); try { if (root.navigator.vibrate) root.navigator.vibrate([60, 40, 60]); } catch (e) { /* not allowed */ } } }
       key = ['bat', b.cs, b.over, b.rnd, b.ti, b.end, SCN.busy(), ui.skill, ui.target, ui.guard, ui.sent, sentHere(S), k, root.LANG, b.cs === k ? [SCN.hp, b.hs[k].cd, b.hs[k].g] : 0];
       if (!changed('panel', key)) return;
-      kids = panelBattle(S);
-    } else if (S.ph === 'reward') { key = ['rw', S.rw, S.pl, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelReward(S); }
+      kids = panelBattle(S); pm = ui.pmode;
+    } else if (S.ph === 'reward') { key = ['rw', S.rw, S.pl, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelReward(S); pm = 'rw'; }
     else if (S.ph === 'jobup') { key = ['ju', S.ju, S.pl, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelJobup(S); target = $('discov'); }
-    else if (S.ph === 'evolve') { key = ['evo', S.evo, root.LANG]; if (!changed('panel', key)) return; kids = [h('div', { class: 'box fill center' }, [h('p', { class: 'lead', text: T('evo_wait', seatName(S, S.evo.to)) })])]; }
-    else if (S.ph === 'cutin') { key = ['ci', S.stage, root.LANG]; if (!changed('panel', key)) return; kids = [h('div', { class: 'box fill center' }, [h('p', { class: 'dim', text: T('cut_next') })])]; }
+    else if (S.ph === 'evolve') { key = ['evo', S.evo, root.LANG]; if (!changed('panel', key)) return; kids = [h('div', { class: 'box fill center' }, [h('p', { class: 'lead', text: T('evo_wait', seatName(S, S.evo.to)) })])]; pm = 'pill'; }
+    else if (S.ph === 'cutin') { key = ['ci', S.stage, root.LANG]; if (!changed('panel', key)) return; kids = [h('div', { class: 'box fill center' }, [h('p', { class: 'dim', text: T('cut_next') })])]; pm = 'pill'; }
     else if (S.ph === 'reveal') { key = ['rv', S.son, root.LANG]; if (!changed('panel', key)) return; kids = panelReveal(S); }
     else { key = ['end', S.res, ROOM.isHost, me(), root.LANG]; if (!changed('panel', key)) return; kids = panelEnd(S); }
-    if (target !== el) swap(el, []);
+    if (target !== el) { swap(el, []); pm = 'none'; }
     swap(target, kids);
+    var cls = 'panel m-' + pm;
+    if (el.className !== cls) { el.className = cls; if (pm !== 'none') { void el.offsetWidth; el.classList.add('enter'); } }
     renderHot();
-    fitLayout();
+    fitLayout(); sheetSpace();
   }
-  /* the stage keeps one size for the whole game: it depends on the window only, never on what the panel below shows.
-     wide: the stage takes a fixed share of the height, the party row sits under it, the panel gets the rest (and scrolls inside if it must).
-     tall (phones): the stage is as wide as the screen allows. */
-  var WIDE = root.matchMedia ? root.matchMedia('(min-aspect-ratio: 5/4) and (min-width: 760px)') : null;
+  /* the stage keeps one size for the whole game: it depends on the window only, never on what the panel shows.
+     wide: the stage is as big as the window allows above a fixed party row; the panel becomes a sheet laid over the
+     bottom of the stage (only while there is something to choose), so the scene never shrinks.
+     tall (phones): the stage is as wide as the screen allows and the panel sits underneath. */
+  var WIDE = root.matchMedia ? root.matchMedia('(min-aspect-ratio: 5/4) and (min-width: 760px)') : null, PARTY_H = 76;
   function fitLayout() {
     var stage = $('stage'), panel = $('panel'), app = $('app');
     var vw = app.clientWidth, vh = root.innerHeight, wide = !!(WIDE && WIDE.matches), key = vw + 'x' + vh + (wide ? 'w' : 't');
     if (ui.fitKey === key) return;
     ui.fitKey = key; panel.style.height = '';
+    if (wide && panel.parentNode !== stage) stage.appendChild(panel);
+    if (!wide && panel.parentNode === stage) $('discov').parentNode.insertBefore(panel, $('discov'));
     var top = doc.querySelector('.top').offsetHeight, w;
-    if (wide) {
-      var mainH = vh - 12 - top - 6, side = Math.max(330, Math.min(480, Math.round(vw * 0.3)));   // command window width; the party row (~108px) sits under the stage
-      w = Math.min(vw - side - 8, Math.floor((mainH - 114) * 384 / 216));
-    } else w = Math.min(vw, Math.floor((vh - 12 - top - 400) * 384 / 216));
+    if (wide) w = Math.min(vw - 4, Math.floor((vh - 12 - top - 6 - PARTY_H - 6) * 384 / 216));
+    else w = Math.min(vw, Math.floor((vh - 12 - top - 400) * 384 / 216));
     stage.style.width = Math.max(240, w) + 'px';
-    alignParty();
+    $('party').style.setProperty('--party-h', PARTY_H + 'px');
+    alignParty(); sheetSpace();
+  }
+  /* keep overlays (the result board) clear of the sheet */
+  function sheetSpace() {
+    var st = $('stage'), p = $('panel'), hpx = 0;
+    if (p.parentNode === st && !p.classList.contains('m-pill') && !p.classList.contains('m-none') && p.firstChild) hpx = p.offsetHeight + 6;
+    st.style.setProperty('--sheet-h', hpx + 'px');
   }
   UI.fit = fitLayout;
   /* the party plates sit right under the characters: the row is exactly as wide as the stage */
